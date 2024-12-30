@@ -93,14 +93,17 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-8 py-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 mt-16">
+      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Left Column - Form */}
           <div className="space-y-8">
             <div>
-              <h1 className="text-4xl font-bold mb-4">
-                Let&apos;s Chat, Reach Out to Us
+              <h1 className="text-5xl font-extrabold mb-4">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-800">
+                  Let's Chat, Reach Out to Us
+                </span>
+                <span className="text-gray-800 block text-3xl mt-2">We'd love to hear from you</span>
               </h1>
               <p className="text-gray-600">
                 Have questions or feedback? We&apos;re here to help. Send us a

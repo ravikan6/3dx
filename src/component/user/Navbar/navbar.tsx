@@ -1,74 +1,58 @@
+'use client';
+
 import React, { useState } from "react";
 import { Box } from "lucide-react";
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { RiShoppingCart2Line, RiUser3Line } from "react-icons/ri";
+import { RiShoppingCart2Line, RiUser3Line, RiMenuLine, RiCloseLine } from "react-icons/ri";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const pathname = usePathname(); // Use usePathname for current path
   const cartItemCount = 3; // Example cart item count
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleProfileDropdown = () =>
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  const navigationLinks = [
+    { name: "Products", href: "/Productpg" },
+    { name: "Creators", href: "/creators" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+  ];
 
-  const isActive = (path: string) => pathname === path; // Compare with pathname
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between p-4">
-        {/* Logo Section */}
+    <header className="fixed top-0 z-50 w-full bg-white shadow-md py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+        {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-2xl font-bold hover:underline transition transform hover:scale-105"
+          className="flex items-center gap-2 text-2xl font-bold text-gray-900 hover:scale-105 transition-transform"
+          aria-label="Homepage"
         >
-          <Box className="h-8 w-8 text-gray-900" />
+          <Box className="h-8 w-8" />
           <span>3D.xyz</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden space-x-8 text-gray-700 sm:block">
-          <Link
-            href="/Productpg"
-            className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-              isActive("/Productpg") ? "underline font-semibold" : ""
-            }`}
-          >
-            Products
-          </Link>
-          <a
-            href="#"
-            className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline`}
-          >
-            Creators
-          </a>
-          <Link
-            href="/about"
-            className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-              isActive("/about") ? "underline font-semibold" : ""
-            }`}
-          >
-            About
-          </Link>
-          <Link
-            href="/Contact"
-            className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-              isActive("/Contact") ? "underline font-semibold" : ""
-            }`}
-          >
-            Contact
-          </Link>
+        {/* Centered Navigation */}
+        <nav className="hidden md:flex space-x-8">
+          {navigationLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="relative text-gray-700 hover:text-gray-900 transition-transform hover:scale-105 text-center"
+            >
+              {link.name}
+              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-gray-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+            </Link>
+          ))}
         </nav>
 
-        {/* Action Section */}
-        <div className="flex items-center gap-4">
+        {/* Action Icons */}
+        <div className="flex items-center space-x-6">
           {/* Cart Icon */}
           <Link
             href="/cart"
-            className="relative text-gray-700 hover:text-gray-900 transition transform hover:scale-105"
+            className="relative text-gray-700 hover:text-gray-900 transition-transform hover:scale-110"
+            aria-label="View cart"
           >
             <RiShoppingCart2Line className="w-6 h-6" />
             {cartItemCount > 0 && (
@@ -78,97 +62,51 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Profile Icon with Dropdown */}
-          <div className="relative">
-            <button
-              className="text-gray-700 hover:text-gray-900 transition transform hover:scale-105"
-              onClick={toggleProfileDropdown}
-            >
-              <RiUser3Line className="w-6 h-6" />
-            </button>
-            {isProfileDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg">
-                <Link
-                  href="/login"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsProfileDropdownOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/signup"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsProfileDropdownOpen(false)}
-                >
-                  Signup
-                </Link>
-                <Link
-                  href="/seller-login"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsProfileDropdownOpen(false)}
-                >
-                  Seller Login
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            className="sm:hidden text-gray-900 focus:outline-none transition-transform hover:scale-110"
-            onClick={toggleMenu}
+          {/* Profile Icon */}
+          <Link
+            href="/profile"
+            className="text-gray-700 hover:text-gray-900 transition-transform hover:scale-110"
+            aria-label="View profile"
           >
-            {isMenuOpen ? "✖" : "☰"}
+            <RiUser3Line className="w-6 h-6" />
+          </Link>
+
+          {/* Hamburger Menu */}
+          <button
+            className="md:hidden text-gray-700 hover:text-gray-900 focus:outline-none transition-transform hover:scale-110"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <RiCloseLine className="w-6 h-6" /> : <RiMenuLine className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="sm:hidden bg-white/90 backdrop-blur-md shadow-md"
-        >
-          <nav className="flex flex-col items-center py-4 space-y-4 text-gray-700">
-            <Link
-              href="/Productpg"
-              className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-                isActive("/Productpg") ? "underline font-semibold" : ""
-              }`}
-              onClick={toggleMenu}
-            >
-              Products
-            </Link>
-            <a
-              href="#"
-              className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline`}
-              onClick={toggleMenu}
-            >
-              Creators
-            </a>
-            <Link
-              href="/about"
-              className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-                isActive("/about") ? "underline font-semibold" : ""
-              }`}
-              onClick={toggleMenu}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className={`hover:text-gray-900 transition transform hover:scale-105 hover:underline ${
-                isActive("/Contact") ? "underline font-semibold" : ""
-              }`}
-              onClick={toggleMenu}
-            >
-              Contact
-            </Link>
-          </nav>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-white shadow-md"
+          >
+            <nav className="flex flex-col items-center py-4 space-y-4">
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-gray-700 hover:text-gray-900 transition-transform hover:scale-105 text-center"
+                  onClick={toggleMenu}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
