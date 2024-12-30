@@ -44,7 +44,7 @@ const AboutPage: React.FC = () => {
               At 3D xyz, we are more than just a company. We are a community dedicated to creating meaningful connections and providing exceptional experiences.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              "Our journey is fueled by creativity, cutting-edge technology, and a commitment to delivering immersive 3D experiences that help our clients visualize and connect with products like never before.
+              Our journey is fueled by creativity, cutting-edge technology, and a commitment to delivering immersive 3D experiences that help our clients visualize and connect with products like never before.
             </p>
           </SectionCard>
 

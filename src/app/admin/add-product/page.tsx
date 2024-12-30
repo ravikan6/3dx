@@ -116,7 +116,7 @@ export default function AddProductPage() {
         throw new Error("Failed to add product");
       }
     } catch (error) {
-      alert("There was a problem adding your product. Please try again.");
+      console.error("Error adding product:", error);
     }
   }
 
@@ -202,7 +202,7 @@ export default function AddProductPage() {
               {isDragActive ? (
                 <p>Drop the files here ...</p>
               ) : (
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Drag and drop some files here, or click to select files</p>
               )}
             </div>
             <div className="mt-4 grid grid-cols-3 gap-4">

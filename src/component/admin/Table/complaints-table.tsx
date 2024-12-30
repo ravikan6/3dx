@@ -33,7 +33,7 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
   const sortedComplaints = useMemo(() => {
     if (!Array.isArray(complaints)) return []
     
-    let sortableComplaints = [...complaints]
+    const sortableComplaints = [...complaints]
     if (sortConfig.key !== null) {
       sortableComplaints.sort((a, b) => {
         if (a[sortConfig.key!] < b[sortConfig.key!]) {

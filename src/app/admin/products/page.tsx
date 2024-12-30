@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Pencil, Save, Search, ArrowUpDown } from "lucide-react";
 import ImageViewer from "@/component/admin/imageSlider/ImageViewer";
 import { Button } from "@/components/ui/button";
 import {
