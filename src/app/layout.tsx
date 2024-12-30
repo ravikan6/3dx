@@ -4,7 +4,6 @@ import "./globals.css";
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/component/user/Navbar/navbar";
 import { Footer } from "@/component/user/Footer/footer";
-import { Toaster } from "@/components/ui/toaster"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +32,6 @@ export default function RootLayout({
       >
         {!isAdminRoute && <Navbar />}
         {children}
-        <Toaster />
         {!isAdminRoute && <Footer />}
       </body>
     </html>
