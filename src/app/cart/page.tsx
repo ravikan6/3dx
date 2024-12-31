@@ -24,7 +24,6 @@ type SectionCardProps = {
 const SectionCard: React.FC<SectionCardProps> = ({
   title,
   children,
-  className = "",
   dataAos = "",
 }) => (
   <div

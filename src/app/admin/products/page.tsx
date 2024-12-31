@@ -28,16 +28,7 @@ interface Product {
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Partial<Product>>({});
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof Product | null;
-    direction: "ascending" | "descending";
-  }>({
-    key: null,
-    direction: "ascending",
-  });
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
 
