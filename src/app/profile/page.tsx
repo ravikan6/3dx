@@ -30,14 +30,14 @@ export default function MyProfile() {
   });
 
   // Handle profile picture change
-  const handleProfilePictureChange = (e) => {
+  const handleProfilePictureChange = (e:any) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileData({
           ...profileData,
-          profilePicture: reader.result, // Update profile picture with the selected image
+          // profilePicture: reader.result, // Update profile picture with the selected image
         });
       };
       reader.readAsDataURL(file);
