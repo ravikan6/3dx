@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Star, Heart } from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Product } from "@/types/product";
@@ -153,10 +153,6 @@ export default function ProductDetail() {
             </Button>
             <Button className="flex-1" onClick={handleAddToBasket}>
               Add to Basket
-            </Button>
-            <Button size="icon" variant="outline">
-              <Heart className="h-5 w-5" />
-              <span className="sr-only">Add to wishlist</span>
             </Button>
           </div>
         </div>

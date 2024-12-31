@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "./image-carousel";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -62,14 +61,6 @@ export function ProductCard({ product, view }: ProductCardProps) {
         >
           <div className="relative w-full h-full">
             <ProductImage src={product.img[0]} alt={product.productName} />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Heart className="h-5 w-5" />
-              <span className="sr-only">Add to wishlist</span>
-            </Button>
           </div>
         </Link>
 
@@ -138,4 +129,3 @@ export function ProductCard({ product, view }: ProductCardProps) {
     </>
   );
 }
-
