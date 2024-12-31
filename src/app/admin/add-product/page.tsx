@@ -121,152 +121,156 @@ export default function AddProductPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-5">Add New Product</h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="productId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product ID</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormDescription>
-                  This is a unique 6-digit code generated for your product.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="productName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="productPrice"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Price (₹)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="inStock"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>In Stock</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(parseInt(e.target.value, 10))
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div>
-            <FormLabel>Product Images</FormLabel>
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed border-gray-300 rounded-lg p-6 mt-2 ${
-                isDragActive ? "bg-blue-50" : ""
-              }`}
-            >
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <p>Drop the files here ...</p>
-              ) : (
-                <p>Drag and drop some files here, or click to select files</p>
-              )}
+    <div className="container mx-auto py-10 px-6">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+        Add New Product
+      </h1>
+      <div className="bg-white shadow rounded-lg p-8">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="productId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product ID</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled className="bg-gray-100" />
+                    </FormControl>
+                    <FormDescription>
+                      Auto-generated unique 6-digit code for the product.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="productName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="productPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Price (₹)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="inStock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>In Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value, 10))
+                        }
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-4">
-              {images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Uploaded image ${index + 1}`}
-                  className="w-full h-auto object-cover rounded-lg"
-                />
-              ))}
-            </div>
-          </div>
-          <FormField
-            control={form.control}
-            name="categories"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel className="text-base">Categories</FormLabel>
-                  <FormDescription>
-                    Select the categories that apply to this product.
-                  </FormDescription>
-                </div>
-                {["electronics", "accessories", "fashion"].map((item) => (
-                  <FormField
-                    key={item}
-                    control={form.control}
-                    name="categories"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== item
-                                      )
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.charAt(0).toUpperCase() + item.slice(1)}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
+            <div>
+              <FormLabel>Product Images</FormLabel>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed border-gray-300 rounded-lg p-6 mt-2 ${
+                  isDragActive ? "bg-blue-50" : "bg-gray-100"
+                }`}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p className="text-center text-gray-500">
+                    Drop the files here...
+                  </p>
+                ) : (
+                  <p className="text-center text-gray-500">
+                    Drag and drop files here, or click to select files
+                  </p>
+                )}
+              </div>
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                {images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Uploaded ${index + 1}`}
+                    className="w-full h-auto object-cover rounded-lg shadow"
                   />
                 ))}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Add Product</Button>
-        </form>
-      </Form>
+              </div>
+            </div>
+            <FormField
+              control={form.control}
+              name="categories"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Categories</FormLabel>
+                  <FormDescription>
+                    Select applicable categories for the product.
+                  </FormDescription>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    {["electronics", "accessories", "fashion"].map((item) => (
+                      <FormField
+                        key={item}
+                        control={form.control}
+                        name="categories"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item)}
+                                onCheckedChange={(checked) => {
+                                  field.onChange(
+                                    checked
+                                      ? [...field.value, item]
+                                      : field.value?.filter(
+                                          (value) => value !== item
+                                        )
+                                  );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal text-gray-700">
+                              {item.charAt(0).toUpperCase() + item.slice(1)}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
+              Add Product
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
