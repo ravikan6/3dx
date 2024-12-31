@@ -11,7 +11,7 @@ export function Navbar() {
   const cartItemCount = 3; // Example cart item count
 
   const navigationLinks = [
-    { name: "Products", href: "/Productpg" },
+    { name: "Products", href: "/shop" },
     { name: "Creators", href: "/creators" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
