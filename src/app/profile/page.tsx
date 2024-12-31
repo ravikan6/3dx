@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { User, Mail, Phone, MapPin, Camera, Save, Edit2 } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -27,17 +29,17 @@ export default function MyProfile() {
     ],
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Add API call to save profile data
-  };
-
   return (
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white shadow-sm rounded-lg overflow-hidden"
+        >
           {/* Profile Header */}
-          <div className="relative h-32 bg-black">
+          <div className="relative h-32 bg-gradient-to-r from-purple-500 to-indigo-500">
             <div className="absolute -bottom-12 left-8">
               <div className="relative">
                 <Image
@@ -65,7 +67,7 @@ export default function MyProfile() {
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
                 {isEditing ? (
                   <>
@@ -82,7 +84,12 @@ export default function MyProfile() {
             </div>
 
             {/* Personal Information */}
-            <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="space-y-6"
+            >
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Personal Information
@@ -158,8 +165,11 @@ export default function MyProfile() {
                 </h2>
                 <div className="space-y-4">
                   {profileData.shippingAddresses.map((address) => (
-                    <div
+                    <motion.div
                       key={address.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
                       className="border border-gray-200 rounded-lg p-4"
                     >
                       <div className="flex items-start justify-between">
@@ -187,7 +197,7 @@ export default function MyProfile() {
                           </button>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                   {isEditing && (
                     <button className="block w-full text-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-400">
@@ -206,9 +216,26 @@ export default function MyProfile() {
                   Change Password
                 </button>
               </div>
+            </motion.div>
+
+            {/* Link to Signup Page */}
+            <div className="mt-8">
+              <Link
+                href={{
+                  pathname: "/signup",
+                  query: {
+                    name: profileData.name,
+                    email: profileData.email,
+                    phone: profileData.phone,
+                  },
+                }}
+                className="text-indigo-600 hover:text-indigo-800 underline"
+              >
+                Go to Signup Page
+              </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </main>
   );
