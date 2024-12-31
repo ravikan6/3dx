@@ -1,127 +1,101 @@
-"use client"
-import { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+'use client'
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  rating: number;
-  category: string;
-}
+import { useState, useEffect } from 'react'
+import { ProductCard } from '@/component/user/ProductComponents/product-card'
+import { CategoryFilter } from '@/component/user/ProductComponents/category-filter'
+import { ViewToggle } from '@/component/user/ProductComponents/view-toggle'
+import { SortProducts } from '@/component/user/ProductComponents/sort-products'
+import type { Product } from '@/types/product'
 
-const products: Product[] = [
-  { id: 1, name: 'Product 1', price: 10, rating: 4, category: 'Electronics' },
-  { id: 2, name: 'Product 2', price: 20, rating: 3, category: 'Fashion' },
-  { id: 3, name: 'Product 3', price: 30, rating: 5, category: 'Electronics' },
-  { id: 4, name: 'Product 4', price: 40, rating: 2, category: 'Fashion' },
-  { id: 5, name: 'Product 5', price: 50, rating: 4, category: 'Electronics' },
-];
-
-const categories = ['Electronics', 'Fashion', 'Home', 'Sports'];
-
-const ShoppingPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const [priceFilter, setPriceFilter] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [view, setView] = useState('grid');
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    const filtered = products.filter((product) => product.category === category);
-    setFilteredProducts(filtered);
-  };
-
-  const handlePriceFilterChange = (price: string) => {
-    setPriceFilter(price);
-    const filtered = products.filter((product) => product.price >= parseInt(price));
-    setFilteredProducts(filtered);
-  };
-
-  const handleRatingFilterChange = (rating: string) => {
-    setRatingFilter(rating);
-    const filtered = products.filter((product) => product.rating >= parseInt(rating));
-    setFilteredProducts(filtered);
-  };
-
-  const handleViewChange = (view: string) => {
-    setView(view);
-  };
-
-  return (
-    <div className="max-w-7xl mx-auto p-4">
-      <div className="flex justify-between mb-4">
-        {categories.map((category) => (
-          <Button key={category} variant="secondary" onClick={() => handleCategoryChange(category)}>
-            {category}
-          </Button>
-        ))}
-      </div>
-      <div className="flex justify-between mb-4">
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Price" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10" onClick={() => handlePriceFilterChange('10')}>$10+</SelectItem>
-            <SelectItem value="20" onClick={() => handlePriceFilterChange('20')}>$20+</SelectItem>
-            <SelectItem value="30" onClick={() => handlePriceFilterChange('30')}>$30+</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Rating" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="2" onClick={() => handleRatingFilterChange('2')}>2+</SelectItem>
-            <SelectItem value="3" onClick={() => handleRatingFilterChange('3')}>3+</SelectItem>
-            <SelectItem value="4" onClick={() => handleRatingFilterChange('4')}>4+</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button variant="secondary" onClick={() => handleViewChange('grid')}>Grid View</Button>
-        <Button variant="secondary" onClick={() => handleViewChange('list')}>List View</Button>
-      </div>
-      {view === 'grid' ? (
-        <div className="grid grid-cols-3 gap-4">
-          {filteredProducts.map((product) => (
-            <Card key={product.id}>
-              <CardHeader>
-                <CardTitle>{product.name}</CardTitle>
-                <CardDescription>Price: ${product.price}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Rating: {product.rating}/5</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="primary">Buy Now</Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col space-y-4">
-          {filteredProducts.map((product) => (
-            <Card key={product.id}>
-              <CardHeader>
-                <CardTitle>{product.name}</CardTitle>
-                <CardDescription>Price: ${product.price}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Rating: {product.rating}/5</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="primary">Buy Now</Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+type ProductsResponse = {
+  products: Product[];
 };
 
-export default ShoppingPage;
+async function getProducts() {
+  const response = await fetch('https://backend3dx.onrender.com/product/get-products');
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  const data = await response.json();
+  return data as ProductsResponse;
+}
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [sortOrder, setSortOrder] = useState<string>('price-asc')
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const data = await getProducts()
+        setProducts(data.products)
+      } catch (err) {
+        setError('Failed to load products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [])
+
+  // Get unique categories from all products
+  const allCategories = Array.from(
+    new Set(products.flatMap(product => product.categories))
+  )
+
+  // Filter products by selected category
+  const filteredProducts = selectedCategory
+    ? products.filter(product => product.categories.includes(selectedCategory))
+    : products
+
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortOrder === 'price-asc') {
+      return a.productPrice - b.productPrice
+    } else {
+      return b.productPrice - a.productPrice
+    }
+  })
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-6">Today's Best Deals For You!</h1>
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
+          <CategoryFilter
+            categories={allCategories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+          <div className="flex gap-4">
+            <SortProducts onSortChange={setSortOrder} />
+            <ViewToggle view={view} onViewChange={setView} />
+          </div>
+        </div>
+      </div>
+
+      <div className={
+        view === 'grid'
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center'
+          : 'flex flex-col gap-6'
+      }>
+        {sortedProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            view={view}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
