@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Mail, Phone, MapPin, Save, Edit2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Save, Edit2, Camera } from "lucide-react"; // Added Camera icon
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -12,6 +12,7 @@ export default function MyProfile() {
     email: "example@gmail.com",
     phone: "+1 (555) 123-4567",
     address: "Enter Your Address",
+    profilePicture: "/path/to/default/profile.jpg", // Added default profile picture
     shippingAddresses: [
       {
         id: 1,
@@ -27,6 +28,21 @@ export default function MyProfile() {
       },
     ],
   });
+
+  // Handle profile picture change
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData({
+          ...profileData,
+          profilePicture: reader.result, // Update profile picture with the selected image
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onSaveProfile = () => {
     // Logic to handle profile update
@@ -71,6 +87,34 @@ export default function MyProfile() {
                   </>
                 )}
               </button>
+            </div>
+
+            {/* Profile Picture Section */}
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="relative">
+                <img
+                  src={profileData.profilePicture}
+                  alt="Profile Picture"
+                  className="h-24 w-24 rounded-full object-cover"
+                />
+                {isEditing && (
+                  <label
+                    htmlFor="profile-picture-upload"
+                    className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white cursor-pointer"
+                  >
+                    <Camera className="h-5 w-5" />
+                  </label>
+                )}
+              </div>
+              {isEditing && (
+                <input
+                  type="file"
+                  id="profile-picture-upload"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                  className="hidden"
+                />
+              )}
             </div>
 
             {/* Personal Information */}
