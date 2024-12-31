@@ -1,12 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RiShoppingCart2Line, RiUser3Line, RiMenuLine, RiCloseLine, RiLoginBoxLine, RiUserAddLine, RiStore2Line } from 'react-icons/ri';
+import { RiShoppingCart2Line, RiUser3Line, RiMenuLine, RiCloseLine } from 'react-icons/ri';
 import { Box } from './Box';
 import { UserDropdown } from './UserDropdown';
-import type { NavbarProps, NavigationLink } from '@/types/navbar';
+import { Avatar } from './avatar';
+import { LogoutDialog } from './LogoutDialog';
+import { useAuth } from '@/context/AuthContext';
+import type { NavbarProps, NavigationLink, UserData } from '@/types/navbar';
 
 const navigationLinks: NavigationLink[] = [
   { name: 'Home', href: '/' },
@@ -17,8 +21,55 @@ const navigationLinks: NavigationLink[] = [
 
 export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProps) {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const router = useRouter();
+  const { logout } = useAuth();
 
   const toggleUserDropdown = () => setIsUserDropdownOpen(!isUserDropdownOpen);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://backend3dx.onrender.com/auth/user/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const data = await response.json();
+        setUserData(data);
+      } catch (err) {
+        setError('Error fetching user data');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleLogout = () => {
+    setIsLogoutDialogOpen(true);
+  };
+
+  const confirmLogout = async () => {
+    await logout();
+    setUserData(null);
+    setIsLogoutDialogOpen(false);
+    router.push('/');
+  };
+
+  const cancelLogout = () => {
+    setIsLogoutDialogOpen(false);
+  };
 
   return (
     <>
@@ -77,17 +128,38 @@ export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProp
             </Link>
 
             <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="text-gray-300 hover:text-white focus:outline-none"
-                onClick={toggleUserDropdown}
-                aria-label="User menu"
-              >
-                <RiUser3Line className="w-6 h-6" />
-              </motion.button>
-              <UserDropdown isOpen={isUserDropdownOpen} onClose={() => setIsUserDropdownOpen(false)} />
+              {isLoading ? (
+                <div className="w-6 h-6 rounded-full bg-gray-600 animate-pulse"></div>
+              ) : error ? (
+                <div className="text-red-500">!</div>
+              ) : userData ? (
+                <motion.div
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={toggleUserDropdown}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Avatar name={userData.name} />
+                  <span className="text-white text-sm">Hi {userData.name.split(' ')[0]}</span>
+                </motion.div>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className="text-gray-300 hover:text-white focus:outline-none"
+                  onClick={toggleUserDropdown}
+                  aria-label="User menu"
+                >
+                  <RiUser3Line className="w-6 h-6" />
+                </motion.button>
+              )}
+              <UserDropdown 
+                isOpen={isUserDropdownOpen} 
+                onClose={() => setIsUserDropdownOpen(false)}
+                isLoggedIn={!!userData}
+                onLogout={handleLogout}
+              />
             </div>
 
             <motion.button
@@ -141,6 +213,12 @@ export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProp
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LogoutDialog
+        isOpen={isLogoutDialogOpen}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </>
   );
 }

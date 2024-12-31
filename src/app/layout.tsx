@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Footer } from "@/component/user/Footer/footer";
 import { useState } from "react";
 import { Navbar } from '@/components/navbar';
+import { AuthProvider } from "@/context/AuthContext";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +37,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+    <AuthProvider>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -48,6 +51,7 @@ export default function RootLayout({
         {children}
         {!isAdminRoute && <Footer />}
       </body>
+    </AuthProvider>
     </html>
   );
 }

@@ -8,4 +8,7 @@ export interface NavbarProps {
     name: string;
     href: string;
   }
-  
+  export interface UserData {
+    name: string;
+    // Add other user properties as needed
+  }
