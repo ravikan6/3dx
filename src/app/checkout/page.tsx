@@ -173,7 +173,7 @@ const Checkout: React.FC = () => {
     try {
       // Make API calls for each item in the cart
       const orderPromises = cartItems.map((item) =>
-        fetch("http://localhost:5000/order/order", {
+        fetch("https://backend3dx.onrender.com/order/order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
