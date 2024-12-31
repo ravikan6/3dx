@@ -3,10 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { Footer } from "@/component/user/Footer/footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from '@/components/navbar';
 import { AuthProvider } from "@/context/AuthContext";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +27,51 @@ export default function RootLayout({
 
   // State for managing mobile menu in Navbar
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState<number>(0);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
-  const cartItemCount = 3; // You can update this value dynamically if needed
+  useEffect(() => {
+    const userId = sessionStorage.getItem("userId");
+
+    if (userId) {
+      // If userId exists, fetch the cart items
+      const fetchCartData = async () => {
+        try {
+          const response = await fetch("https://backend3dx.onrender.com/cart/get-cart", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Parse the products in cart, remove duplicates based on productId
+            const productsInCart = JSON.parse(data.cart.productsInCart);
+            const uniqueProductIds = [
+              ...new Set(productsInCart.map((item: any) => item.productId)),
+            ];
+            setCartItemCount(uniqueProductIds.length); // Set the cart item count
+          } else {
+            setCartItemCount(0); // If no cart found
+          }
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+          setCartItemCount(0); // In case of error, set count to 0
+        }
+      };
+
+      fetchCartData();
+    } else {
+      // If no userId, set cartItemCount to 0
+      setCartItemCount(0);
+    }
+  }, []);
 
   return (
     <html lang="en">

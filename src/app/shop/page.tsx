@@ -66,7 +66,7 @@ export default function ProductsPage() {
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-6">Today's Best Deals For You!</h1>
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">

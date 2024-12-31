@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "./image-carousel";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Product } from "@/types/product";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +16,33 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, view }: ProductCardProps) {
+  const router = useRouter();
+  const [showDialog, setShowDialog] = useState(false);
+
+  const handleAddToCart = async () => {
+    const userId = sessionStorage.getItem("userId");
+
+    if (!userId) {
+      // Show dialog if userId is not available in session storage
+      setShowDialog(true);
+      return;
+    }
+
+    try {
+      // Make the API call to add the product to the cart
+      await axios.post("https://backend3dx.onrender.com/cart/addtocart", {
+        userId,
+        productId: product.productId,
+        quantity: 1,
+      });
+
+      alert("Product added to cart successfully!");
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("Failed to add product to cart. Please try again.");
+    }
+  };
+
   const cardClassName =
     view === "grid"
       ? "w-[300px] h-[450px] flex flex-col"
@@ -28,21 +59,23 @@ export function ProductCard({ product, view }: ProductCardProps) {
       : "flex flex-col flex-grow p-4 gap-2 justify-between";
 
   return (
-    <div
-      className={`group relative bg-card rounded-lg border shadow-sm ${cardClassName}`}
-    >
-      <Link href={`/shop/${product.productId}`}>
-        <div className={`${imageClassName} overflow-hidden`}>
-          <ProductImage src={product.img[0]} alt={product.productName} />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Heart className="h-5 w-5" />
-            <span className="sr-only">Add to wishlist</span>
-          </Button>
-        </div>
+    <>
+      <div
+        className={`group relative bg-card rounded-lg border shadow-sm ${cardClassName}`}
+      >
+        <Link href={`/shop/${product.productId}`}>
+          <div className={`${imageClassName} overflow-hidden`}>
+            <ProductImage src={product.img[0]} alt={product.productName} />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Heart className="h-5 w-5" />
+              <span className="sr-only">Add to wishlist</span>
+            </Button>
+          </div>
+        </Link>
         <div className={contentClassName}>
           <div className="space-y-2">
             <h3 className="font-semibold text-lg line-clamp-2">
@@ -69,10 +102,43 @@ export function ProductCard({ product, view }: ProductCardProps) {
             <p className="text-sm text-muted-foreground">
               {product.inStock} in stock
             </p>
-            <Button className="w-full">Add to Cart</Button>
+            <Button className="w-full" onClick={handleAddToCart}>
+              Add to Cart
+            </Button>
           </div>
         </div>
-      </Link>
-    </div>
+      </div>
+
+      {/* Dialog Box */}
+      {showDialog && (
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Oops! You are not logged in</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Please log in to add products to your cart.
+            </p>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  router.push("/login");
+                }}
+              >
+                I'll Login
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  router.push("/shop");
+                }}
+              >
+                No, I'll Pass
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
