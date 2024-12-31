@@ -5,12 +5,12 @@ import { useState } from 'react';
 
 interface UserDropdownProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void;    
   isLoggedIn: boolean;
   onLogout: () => void;
 }
 
-export function UserDropdown({ isOpen, onClose, isLoggedIn, onLogout }: UserDropdownProps) {
+export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps) {
   const loggedOutItems = [
     { name: 'Login', href: '/login', icon: RiLoginBoxLine },
     { name: 'Sign Up', href: '/signup', icon: RiUserAddLine },

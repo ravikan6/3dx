@@ -23,6 +23,7 @@ export default function SellerLoginPage() {
             router.push('/seller/dashboard') // Redirect to seller dashboard after successful login
         } catch (err) {
             setError('Failed to login. Please check your credentials.')
+            console.log(err)
         }
     }
 
