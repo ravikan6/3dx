@@ -1,13 +1,14 @@
-import { Hero } from "@/component/user/Hero/hero";
-import { FeaturedProducts } from "@/component/user/FeaturedProducts/featuredproduct";
+'use client';
 
-const Home = () => {
+import FeaturedProducts from '@/component/user/FeaturedProducts/featuredproduct';
+
+export default function Home() {
+
+
   return (
-    <div>
-      <Hero />
+    <main>
       <FeaturedProducts />
-    </div>
+    </main>
   );
-};
+}
 
-export default Home;
