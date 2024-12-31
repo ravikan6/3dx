@@ -9,10 +9,10 @@ import Link from "next/link";
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: "Krishna Chavan",
-    email: "krishna@example.com",
+    name: "Enter Your Full Name",
+    email: "example@gmail.com",
     phone: "+1 (555) 123-4567",
-    address: "123 Main Street, Apt 4B, New York, NY 10001",
+    address: "Enter Your Address",
     shippingAddresses: [
       {
         id: 1,
