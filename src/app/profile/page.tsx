@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Mail, Phone, MapPin, Camera, Save, Edit2 } from "lucide-react";
-import Image from "next/image";
+import { User, Mail, Phone, MapPin, Save, Edit2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -29,6 +28,12 @@ export default function MyProfile() {
     ],
   });
 
+  const onSaveProfile = () => {
+    // Logic to handle profile update
+    console.log("Profile updated:", profileData);
+    alert("Profile updated successfully!");
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,26 +43,8 @@ export default function MyProfile() {
           transition={{ duration: 0.5 }}
           className="bg-white shadow-sm rounded-lg overflow-hidden"
         >
-          {/* Profile Header */}
-          <div className="relative h-32 bg-gradient-to-r from-purple-500 to-indigo-500">
-            <div className="absolute -bottom-12 left-8">
-              <div className="relative">
-                <Image
-                  src="/placeholder.svg?height=96&width=96"
-                  alt="Profile"
-                  width={96}
-                  height={96}
-                  className="rounded-full border-4 border-white"
-                />
-                <button className="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-lg">
-                  <Camera className="h-4 w-4 text-gray-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Profile Content */}
-          <div className="pt-16 pb-8 px-8">
+          <div className="pt-8 pb-8 px-8">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
@@ -66,7 +53,10 @@ export default function MyProfile() {
                 </p>
               </div>
               <button
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => {
+                  if (isEditing) onSaveProfile();
+                  setIsEditing(!isEditing);
+                }}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
                 {isEditing ? (
