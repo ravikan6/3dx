@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "./image-carousel";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,13 +23,11 @@ export function ProductCard({ product, view }: ProductCardProps) {
     const userId = sessionStorage.getItem("userId");
 
     if (!userId) {
-      // Show dialog if userId is not available in session storage
       setShowDialog(true);
       return;
     }
 
     try {
-      // Make the API call to add the product to the cart
       await axios.post("https://backend3dx.onrender.com/cart/addtocart", {
         userId,
         productId: product.productId,
@@ -43,28 +41,26 @@ export function ProductCard({ product, view }: ProductCardProps) {
     }
   };
 
-  const cardClassName =
-    view === "grid"
-      ? "w-[300px] h-[450px] flex flex-col"
-      : "w-full h-[200px] flex flex-row";
+  const cardClassName = view === "grid"
+    ? "w-[280px] h-[420px]" // Fixed dimensions for grid view
+    : "w-full h-[200px]";
 
-  const imageClassName =
-    view === "grid"
-      ? "w-full h-[250px] flex-shrink-0"
-      : "w-[200px] h-full flex-shrink-0";
-
-  const contentClassName =
-    view === "grid"
-      ? "flex flex-col flex-grow p-4 gap-2"
-      : "flex flex-col flex-grow p-4 gap-2 justify-between";
+  const imageContainerClassName = view === "grid"
+    ? "h-[280px] w-full" // Fixed height for grid view
+    : "w-[200px] h-[200px]"; // Square dimensions for list view
 
   return (
     <>
       <div
-        className={`group relative bg-card rounded-lg border shadow-sm ${cardClassName}`}
+        className={`group relative bg-card rounded-lg border shadow-sm overflow-hidden ${cardClassName} flex ${
+          view === "grid" ? "flex-col" : "flex-row"
+        }`}
       >
-        <Link href={`/shop/${product.productId}`}>
-          <div className={`${imageClassName} overflow-hidden`}>
+        <Link 
+          href={`/shop/${product.productId}`}
+          className={`block ${imageContainerClassName}`}
+        >
+          <div className="relative w-full h-full">
             <ProductImage src={product.img[0]} alt={product.productName} />
             <Button
               variant="ghost"
@@ -76,12 +72,17 @@ export function ProductCard({ product, view }: ProductCardProps) {
             </Button>
           </div>
         </Link>
-        <div className={contentClassName}>
+
+        <div className={`flex flex-col p-4 ${
+          view === "grid" 
+            ? "flex-1 justify-between" 
+            : "flex-1 justify-between ml-4"
+        }`}>
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg line-clamp-2">
+            <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">
               {product.productName}
             </h3>
-            <p className="text-xl font-bold">
+            <p className="text-lg font-bold">
               ₹{product.productPrice.toLocaleString("en-IN")}
             </p>
             <div className="flex items-center gap-1">
@@ -98,47 +99,43 @@ export function ProductCard({ product, view }: ProductCardProps) {
               <span className="text-sm text-muted-foreground">(121)</span>
             </div>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 mt-auto">
             <p className="text-sm text-muted-foreground">
               {product.inStock} in stock
             </p>
-            <Button className="w-full" onClick={handleAddToCart}>
+            <Button 
+              className="w-full" 
+              onClick={handleAddToCart}
+              size={view === "grid" ? "default" : "sm"}
+            >
               Add to Cart
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Dialog Box */}
-      {showDialog && (
-        <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Oops! You are not logged in</DialogTitle>
-            </DialogHeader>
-            <p className="text-sm text-muted-foreground">
-              Please log in to add products to your cart.
-            </p>
-            <DialogFooter>
-              <Button
-                onClick={() => {
-                  router.push("/login");
-                }}
-              >
-                I'll Login
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  router.push("/shop");
-                }}
-              >
-                No, I'll Pass
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Oops! You are not logged in</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Please log in to add products to your cart.
+          </p>
+          <DialogFooter>
+            <Button onClick={() => router.push("/login")}>
+              I'll Login
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push("/shop")}
+            >
+              No, I'll Pass
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+

@@ -57,11 +57,12 @@ const CartItem: React.FC<{
       <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
       <div className="flex items-center justify-center sm:justify-start gap-4 mt-2">
         <button
-          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all"
+          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all disabled:opacity-50"
           onClick={() =>
             item.quantity > 1 &&
             onUpdateQuantity(item.id, item.quantity - 1) // Decrement quantity
           }
+          disabled={item.quantity <= 1}
         >
           <AiOutlineMinus />
         </button>
@@ -129,7 +130,7 @@ const Cart: React.FC = () => {
         );
 
         // Fetch product details for each unique product
-        const productPromises = uniqueProducts.map(async (cartItem: any) => {
+        const products = await Promise.all(uniqueProducts.map(async (cartItem: any) => {
           const productResponse = await fetch(
             `https://backend3dx.onrender.com/product/product/${cartItem.productId}`
           );
@@ -146,12 +147,10 @@ const Cart: React.FC = () => {
             id: cartItem.productId,
             name: product.productName,
             price: product.productPrice,
-            quantity: cartItem.quantity,
-            image: product.img[0], // Use the first image
+            quantity: cartItem.productQty, // Changed from cartItem.quantity to cartItem.productQty
+            image: product.img[0],
           };
-        });
-
-        const products = await Promise.all(productPromises);
+        }));
 
         setCartItems(products);
       } catch (error) {
@@ -208,12 +207,17 @@ const Cart: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId, productId, productQty: newQuantity }),
+          body: JSON.stringify({ 
+            userId, 
+            productId, 
+            productQty: newQuantity 
+          }),
         }
       );
 
       const data = await response.json();
       if (data.success) {
+        // Update local state only after successful API response
         setCartItems((prevItems) =>
           prevItems.map((item) =>
             item.id === productId ? { ...item, quantity: newQuantity } : item
@@ -221,9 +225,11 @@ const Cart: React.FC = () => {
         );
       } else {
         console.error("Failed to update quantity:", data.message);
+        // Optionally show an error message to the user
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
+      // Optionally show an error message to the user
     }
   };
 
@@ -293,9 +299,9 @@ const Cart: React.FC = () => {
               <p className="flex justify-between mb-4">
                 <span>Subtotal:</span> <span>Rs.{totalAmount.toFixed(2)}</span>
               </p>
-            <p className="flex justify-between font-bold text-lg text-gray-800">
+              <p className="flex justify-between font-bold text-lg text-gray-800">
                 <span>Total:</span>{" "}
-                <span>Rs.{(totalAmount +0.00).toFixed(2)}</span>
+                <span>Rs.{(totalAmount + 0.00).toFixed(2)}</span>
               </p>
             </div>
             <button
@@ -312,3 +318,4 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
+
