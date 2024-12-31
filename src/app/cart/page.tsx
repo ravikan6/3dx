@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import type { Product } from "@/types/product";
 
 type CartItemProps = {
+  id: string;
   name: string;
   price: number;
   quantity: number;
@@ -19,7 +21,12 @@ type SectionCardProps = {
   dataAos?: string;
 };
 
-const SectionCard: React.FC<SectionCardProps> = ({ title, children, className = "", dataAos = "" }) => (
+const SectionCard: React.FC<SectionCardProps> = ({
+  title,
+  children,
+  className = "",
+  dataAos = "",
+}) => (
   <div
     data-aos={dataAos}
     className={`bg-white rounded-3xl p-8 transition-all duration-500 transform hover:scale-[1.02] hover:shadow-xl shadow-lg Rs.{className}`}
@@ -34,15 +41,43 @@ const SectionCard: React.FC<SectionCardProps> = ({ title, children, className = 
   </div>
 );
 
-const CartItem: React.FC<CartItemProps> = ({ name, price, quantity, image }) => (
+const CartItem: React.FC<{
+  item: CartItemProps;
+  onDelete: (productId: string) => void;
+  onUpdateQuantity: (productId: string, newQuantity: number) => void;
+}> = ({ item, onDelete, onUpdateQuantity }) => (
   <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-100 p-4 rounded-2xl shadow-md hover:shadow-lg transition-all mb-4">
-    <img src={image} alt={name} className="w-16 h-16 object-cover rounded-xl" />
+    <img
+      src={item.image}
+      alt={item.name}
+      className="w-16 h-16 object-cover rounded-xl"
+    />
     <div className="flex-1 text-center sm:text-left">
-      <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-      <p className="text-gray-600">Price: Rs.{price.toFixed(2)}</p>
-      <p className="text-gray-600">Quantity: {quantity}</p>
+      <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+      <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
+      <div className="flex items-center justify-center sm:justify-start gap-4 mt-2">
+        <button
+          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all"
+          onClick={() =>
+            item.quantity > 1 &&
+            onUpdateQuantity(item.id, item.quantity - 1) // Decrement quantity
+          }
+        >
+          <AiOutlineMinus />
+        </button>
+        <span className="text-gray-800">{item.quantity}</span>
+        <button
+          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all"
+          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} // Increment quantity
+        >
+          <AiOutlinePlus />
+        </button>
+      </div>
     </div>
-    <button className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all mt-4 sm:mt-0">
+    <button
+      className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all mt-4 sm:mt-0"
+      onClick={() => onDelete(item.id)} // Delete item
+    >
       <FaTrash />
     </button>
   </div>
@@ -57,75 +92,145 @@ const Cart: React.FC = () => {
   useEffect(() => {
     const fetchCartData = async () => {
       const userId = sessionStorage.getItem("userId");
-  
+
       if (!userId) {
         setError("Please log in to view the cart.");
         setLoading(false);
         return;
       }
-  
+
       try {
         // Fetch cart data
-        const cartResponse = await fetch("https://backend3dx.onrender.com/cart/get-cart", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId }),
-        });
-  
+        const cartResponse = await fetch(
+          "https://backend3dx.onrender.com/cart/get-cart",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
+
         const cartData = await cartResponse.json();
-  
+
         if (!cartData.success) {
           setError("Failed to fetch cart data.");
           setLoading(false);
           return;
         }
-  
+
         let productsInCart = JSON.parse(cartData.cart.productsInCart);
-  
+
         // Filter out duplicates based on productId
         const uniqueProducts = productsInCart.filter(
           (item: any, index: number, self: any[]) =>
             index === self.findIndex((t) => t.productId === item.productId)
         );
-  
+
         // Fetch product details for each unique product
         const productPromises = uniqueProducts.map(async (cartItem: any) => {
           const productResponse = await fetch(
             `https://backend3dx.onrender.com/product/product/${cartItem.productId}`
           );
           const productData = await productResponse.json();
-  
+
           if (!productData.success) {
-            throw new Error(`Failed to fetch product details for ID: ${cartItem.productId}`);
+            throw new Error(
+              `Failed to fetch product details for ID: ${cartItem.productId}`
+            );
           }
-  
+
           const product: Product = productData.product;
           return {
+            id: cartItem.productId,
             name: product.productName,
             price: product.productPrice,
             quantity: cartItem.quantity,
             image: product.img[0], // Use the first image
           };
         });
-  
+
         const products = await Promise.all(productPromises);
-  
+
         setCartItems(products);
       } catch (error) {
         console.error("Error fetching cart data:", error);
-        setError("An error occurred while fetching cart data. Please try again.");
+        setError(
+          "An error occurred while fetching cart data. Please try again."
+        );
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchCartData();
   }, []);
-  
 
-  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const handleDelete = async (productId: string) => {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+      const response = await fetch(
+        "https://backend3dx.onrender.com/cart/delete-item",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, productId }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item.id !== productId)
+        );
+      } else {
+        console.error("Failed to delete item:", data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+      const response = await fetch(
+        "https://backend3dx.onrender.com/cart/update-quantity",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, productId, productQty: newQuantity }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setCartItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === productId ? { ...item, quantity: newQuantity } : item
+          )
+        );
+      } else {
+        console.error("Failed to update quantity:", data.message);
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   if (loading) {
     return (
@@ -170,13 +275,12 @@ const Cart: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <SectionCard title="Cart Items" dataAos="fade-right">
             {cartItems.length > 0 ? (
-              cartItems.map((item, index) => (
+              cartItems.map((item) => (
                 <CartItem
-                  key={index}
-                  name={item.name}
-                  price={item.price}
-                  quantity={item.quantity}
-                  image={item.image}
+                  key={item.id}
+                  item={item}
+                  onDelete={handleDelete}
+                  onUpdateQuantity={handleUpdateQuantity}
                 />
               ))
             ) : (
@@ -189,11 +293,9 @@ const Cart: React.FC = () => {
               <p className="flex justify-between mb-4">
                 <span>Subtotal:</span> <span>Rs.{totalAmount.toFixed(2)}</span>
               </p>
-              <p className="flex justify-between mb-4">
-                <span>Shipping:</span> <span>Rs.5.99</span>
-              </p>
-              <p className="flex justify-between font-bold text-lg text-gray-800">
-                <span>Total:</span> <span>Rs.{(totalAmount + 5.99).toFixed(2)}</span>
+            <p className="flex justify-between font-bold text-lg text-gray-800">
+                <span>Total:</span>{" "}
+                <span>Rs.{(totalAmount +0.00).toFixed(2)}</span>
               </p>
             </div>
             <button
