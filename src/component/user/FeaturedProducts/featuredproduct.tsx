@@ -81,7 +81,7 @@ export function FeaturedProducts() {
                       whileHover={{ scale: 1.1 }}
                       transition={{ type: 'spring', stiffness: 200 }}
                     >
-                      ${product.price?.toFixed(2)}
+                      ₹{product.price?.toFixed(2)}
                     </motion.span>
                     <div className="flex items-center bg-yellow-50/80 backdrop-blur-sm px-3 py-1 rounded-full">
                       <span className="text-yellow-500 text-lg">★★★★★</span>
