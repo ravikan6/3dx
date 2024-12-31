@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
+import { FaTrash } from "react-icons/fa";
 
 type CartItemProps = {
   name: string;
@@ -30,20 +34,21 @@ const SectionCard: React.FC<SectionCardProps> = ({ title, children, className = 
 );
 
 const CartItem: React.FC<CartItemProps> = ({ name, price, quantity, image }) => (
-  <div className="flex items-center gap-4 bg-gray-100 p-4 rounded-2xl shadow-md hover:shadow-lg transition-all mb-4">
+  <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-100 p-4 rounded-2xl shadow-md hover:shadow-lg transition-all mb-4">
     <img src={image} alt={name} className="w-16 h-16 object-cover rounded-xl" />
-    <div className="flex-1">
+    <div className="flex-1 text-center sm:text-left">
       <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
       <p className="text-gray-600">Price: ${price.toFixed(2)}</p>
       <p className="text-gray-600">Quantity: {quantity}</p>
     </div>
-    <button className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all">
-      Remove
+    <button className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all mt-4 sm:mt-0">
+      <FaTrash />
     </button>
   </div>
 );
 
-const cart: React.FC = () => {
+const Cart: React.FC = () => {
+  const router = useRouter();
   const cartItems = [
     {
       name: "3D Printed Lamp",
@@ -100,7 +105,10 @@ const cart: React.FC = () => {
                 <span>Total:</span> <span>${(totalAmount + 5.99).toFixed(2)}</span>
               </p>
             </div>
-            <button className="w-full mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl text-lg font-bold hover:bg-blue-600 transition-all">
+            <button
+              className="w-full mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl text-lg font-bold hover:bg-blue-600 transition-all"
+              onClick={() => router.push("/checkout")}
+            >
               Proceed to Checkout
             </button>
           </SectionCard>
@@ -123,4 +131,4 @@ const cart: React.FC = () => {
   );
 };
 
-export default cart;
+export default Cart;
