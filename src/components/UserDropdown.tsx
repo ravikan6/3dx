@@ -3,24 +3,31 @@ import { RiLoginBoxLine, RiUserAddLine, RiStore2Line, RiUser3Line, RiFileList3Li
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 
+interface UserDropdownItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  onClick?: () => void; // Make onClick optional
+}
+
 interface UserDropdownProps {
   isOpen: boolean;
-  onClose: () => void;    
+  onClose: () => void;
   isLoggedIn: boolean;
   onLogout: () => void;
 }
 
 export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps) {
-  const loggedOutItems = [
+  const loggedOutItems: UserDropdownItem[] = [
     { name: 'Login', href: '/login', icon: RiLoginBoxLine },
     { name: 'Sign Up', href: '/signup', icon: RiUserAddLine },
     { name: 'Seller', href: '/seller', icon: RiStore2Line },
   ];
 
-  const loggedInItems = [
+  const loggedInItems: UserDropdownItem[] = [
     { name: 'My Profile', href: '/profile', icon: RiUser3Line },
     { name: 'My Orders', href: '/orders', icon: RiFileList3Line },
-    { name: 'Logout', href: '#', icon: RiLogoutBoxRLine, onClick: onLogout },
+    { name: 'Logout', href: '#', icon: RiLogoutBoxRLine, onClick: onLogout }, // onClick defined here
   ];
 
   const items = isLoggedIn ? loggedInItems : loggedOutItems;
@@ -39,7 +46,7 @@ export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps
             {items.map((item) => (
               <Link key={item.name} href={item.href} legacyBehavior>
                 <a
-                  onClick={item.onClick}
+                  onClick={item.onClick} // Will only be invoked if defined
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <item.icon className="mr-3 h-5 w-5" />
