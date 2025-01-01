@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { ComplaintsTable } from "@/component/admin/Table/complaints-table";
 import { Input } from "@/components/ui/input";
 import { Complaint } from "@/types/complaints";
-import { Sidebar } from "@/component/admin/sidebar/sidebar";
+import Sidebar from "@/component/admin/sidebar/sidebar"; // Import the Sidebar component
 
 export default function ComplaintsPage() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -56,14 +56,12 @@ export default function ComplaintsPage() {
   );
 
   return (
-    <div className="flex bg-pink-50 min-h-screen">
+    <div className="flex h-screen">
       {/* Sidebar Section */}
-      <div className="hidden w-64 border-r bg-white md:block">
-        <Sidebar />
-      </div>
+      <Sidebar className="w-64" /> {/* Ensure Sidebar has a fixed width */}
 
       {/* Table Section */}
-      <div className="flex-1 p-6 lg:p-8 ml-[2rem]">
+      <div className="flex-1 p-6 lg:p-8 overflow-auto">
         <div className="container mx-auto">
           {/* Search Section */}
           <div className="mb-6 flex justify-between items-center">

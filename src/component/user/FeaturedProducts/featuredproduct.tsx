@@ -41,10 +41,10 @@ export function FeaturedProducts() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-6xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800 bg-clip-text text-transparent mb-4">
+          <h2 className="text-7xl font-extrabold text-white bg-clip-text text-transparent mb-4">
             Featured Products
           </h2>
-          <p className="text-gray-600 text-xl">Discover our exclusive collection</p>
+          <p className="text-gray-500 text-3xl">Discover our exclusive collection</p>
         </motion.div>
 
         <motion.div
