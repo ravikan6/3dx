@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import CouponPage from "@/component/admin/CouponPage/CouponPage";
+import Customer from '@/component/admin/customer/customer';
+
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -18,7 +20,7 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const isAdminRoute = pathname.startsWith("/admin");
-  const isCouponPage = pathname.startsWith("/admin/coupon");  // Updated to handle possible query params
+  const isCouponPage = pathname.startsWith("/admin/coupon");  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);

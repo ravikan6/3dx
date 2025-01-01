@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   LayoutDashboard,
   Package,
@@ -31,16 +30,14 @@ export function Sidebar({ className }: { className?: string }) {
 
         <div className="space-y-4">
           <div>
-            <h3 className="text-xs font-medium text-muted-foreground mb-2">
-              MAIN MENU
-            </h3>
+            <h3 className="text-xs font-medium text-muted-foreground mb-2">MAIN MENU</h3>
             <div className="space-y-1">
               {[
                 { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
                 { href: "/admin/products", icon: Package, label: "Products" },
                 { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
                 { href: "/admin/complaints", icon: MessageCircle, label: "Complaints" },
-                { href: "/admin/customers", icon: Users, label: "Customers" },
+                { href: "/admin/customers", icon: Users, label: "Customers" }, // Customers page route added
                 { href: "/admin/coupons", icon: Tag, label: "Coupons" },
               ].map((item) => (
                 <Link href={item.href} passHref key={item.label}>

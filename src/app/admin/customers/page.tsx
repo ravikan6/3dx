@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Sidebar from '@/component/admin/sidebar/sidebar';
+import customer from '@/component/admin/customer/customer';  
+
+
 
 interface Customer {
   userId: string;
@@ -24,13 +27,8 @@ const CustomersPage = () => {
     key: null,
     direction: 'ascending',
   });
-  const [newCustomer, setNewCustomer] = useState<Customer>({
-    userId: '',
-    name: '',
-    email: '',
-    accountStatus: 'open',
-  });
 
+  
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -78,35 +76,18 @@ const CustomersPage = () => {
       console.error('Error updating account status:', error);
     }
   };
-
-  const handleAddCustomer = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/add-customer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newCustomer),
-      });
-
-      if (response.ok) {
-        fetchCustomers(); // Refresh customers list after adding
-        setNewCustomer({ userId: '', name: '', email: '', accountStatus: 'open' }); // Clear the form
-      }
-    } catch (error) {
-      console.error('Error adding customer:', error);
-    }
-  };
-
   const sortedCustomers = useMemo(() => {
-    if (!sortConfig.key) return customers;
+    if (!sortConfig.key) return customers; 
     return [...customers].sort((a, b) => {
       const aValue = String(a[sortConfig.key as keyof Customer] || '').toLowerCase();
       const bValue = String(b[sortConfig.key as keyof Customer] || '').toLowerCase();
-
+  
       if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
       return 0;
     });
   }, [customers, sortConfig]);
+  
 
   const filteredCustomers = useMemo(() => {
     const lowerSearchQuery = searchQuery.toLowerCase();
@@ -133,27 +114,6 @@ const CustomersPage = () => {
             />
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border mb-6">
-              <Input
-                placeholder="User ID"
-                value={newCustomer.userId}
-                onChange={(e) => setNewCustomer({ ...newCustomer, userId: e.target.value })}
-                className="mb-2"
-              />
-              <Input
-                placeholder="Name"
-                value={newCustomer.name}
-                onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                className="mb-2"
-              />
-              <Input
-                placeholder="Email"
-                value={newCustomer.email}
-                onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                className="mb-2"
-              />
-              <Button onClick={handleAddCustomer}>Add Customer</Button>
-            </div>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
