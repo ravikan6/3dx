@@ -1,76 +1,79 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Store } from 'lucide-react'
 
-export default function SellerLoginPage() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
-    const { login } = useAuth()
-    const router = useRouter()
+export default function SellerLogin() {
+  const [formData, setFormData] = useState({
+    sellerId: '',
+    emailOrContact: '',
+    password: ''
+  })
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setError('')
-        try {
-            await login(email, password)
-            router.push('/seller/dashboard') // Redirect to seller dashboard after successful login
-        } catch (err) {
-            setError('Failed to login. Please check your credentials.')
-            console.log(err)
-        }
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Handle form submission
+    console.log('Form submitted:', formData)
+  }
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
-            <div className="w-full max-w-md">
-                <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg px-12 pt-8 pb-8 mb-4 transform transition-all hover:scale-105">
-                    <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Seller Login</h2>
-                    <div className="mb-4">
-                        <Label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-                            Email
-                        </Label>
-                        <Input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Enter your email"
-                            required
-                        />
-                    </div>
-                    <div className="mb-6">
-                        <Label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-                            Password
-                        </Label>
-                        <Input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Enter your password"
-                            required
-                        />
-                    </div>
-                    {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
-                    <div className="flex items-center justify-between">
-                        <Button type="submit" className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out transform hover:scale-105">
-                            Sign In
-                        </Button>
-                        <Link href="/seller/signup" className="inline-block align-baseline font-bold text-sm text-gray-800 hover:text-gray-700">
-                            Need an account?
-                        </Link>
-                    </div>
-                </form>
+  return (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white">
+        <CardHeader>
+          <div className="flex items-center justify-center mb-2">
+            <Store className="h-6 w-6 text-black" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-center text-black">Seller Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="sellerId" className="text-sm font-medium text-gray-700">Seller ID</Label>
+              <Input
+                id="sellerId"
+                type="text"
+                placeholder="Enter your seller ID"
+                value={formData.sellerId}
+                onChange={(e) => setFormData({ ...formData, sellerId: e.target.value })}
+                required
+                className="border-gray-300 focus:border-black focus:ring-black"
+              />
             </div>
-        </div>
-    )
+            <div className="space-y-2">
+              <Label htmlFor="emailOrContact" className="text-sm font-medium text-gray-700">Email or Contact Number</Label>
+              <Input
+                id="emailOrContact"
+                type="text"
+                placeholder="Enter your email or contact number"
+                value={formData.emailOrContact}
+                onChange={(e) => setFormData({ ...formData, emailOrContact: e.target.value })}
+                required
+                className="border-gray-300 focus:border-black focus:ring-black"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                className="border-gray-300 focus:border-black focus:ring-black"
+              />
+            </div>
+            <Button type="submit" className="w-full bg-black hover:bg-gray-800 text-white">
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
+
