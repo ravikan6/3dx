@@ -140,7 +140,7 @@ export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProp
                   whileTap={{ scale: 0.95 }}
                 >
                   <Avatar name={userData.name} />
-                  <span className="text-white text-sm">Hi {userData.name.split(' ')[0]}</span>
+                  <span className="text-white text-sm hidden sm:block">Hi {userData.name.split(' ')[0]}</span>
                 </motion.div>
               ) : (
                 <motion.button
@@ -224,4 +224,3 @@ export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProp
 }
 
 export default Navbar;
-

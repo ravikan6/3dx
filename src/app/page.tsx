@@ -1,11 +1,13 @@
 'use client';
 
+import FeaturedProducts from '@/component/user/FeaturedProducts/featuredproduct';
 import Hero from '@/component/user/Hero/hero';
 
 export default function Home() {
   return (
-    <main className="w-screen h-[70vh]">
+    <main >
       <Hero />
+      <FeaturedProducts />
     </main>
   );
 }

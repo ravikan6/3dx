@@ -9,9 +9,7 @@ import { Plus } from 'lucide-react'
 export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#F9FAFB]">
-      <div className="hidden w-64 border-r bg-white md:block">
-        <Sidebar />
-      </div>
+      <Sidebar className="w-64 h-screen" /> {/* Ensure Sidebar has a fixed width and height */}
       <div className="flex-1">
         <Header />
         <main className="p-6 space-y-6">
@@ -42,4 +40,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
