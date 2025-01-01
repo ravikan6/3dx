@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,9 @@ import { Store } from 'lucide-react'
 export default function SellerLogin() {
   const [formData, setFormData] = useState({
     sellerId: '',
-    emailOrContact: '',
+    contactOption: 'email', // default selection
+    email: '',
+    mobile: '',
     password: ''
   })
 
@@ -43,18 +45,63 @@ export default function SellerLogin() {
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="emailOrContact" className="text-sm font-medium text-gray-700">Email or Contact Number</Label>
-              <Input
-                id="emailOrContact"
-                type="text"
-                placeholder="Enter your email or contact number"
-                value={formData.emailOrContact}
-                onChange={(e) => setFormData({ ...formData, emailOrContact: e.target.value })}
-                required
-                className="border-gray-300 focus:border-black focus:ring-black"
-              />
+              <Label className="text-sm font-medium text-gray-700">Contact Option</Label>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="contactOption"
+                    value="email"
+                    checked={formData.contactOption === 'email'}
+                    onChange={(e) => setFormData({ ...formData, contactOption: e.target.value, mobile: '' })}
+                  />
+                  <span>Email</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="contactOption"
+                    value="mobile"
+                    checked={formData.contactOption === 'mobile'}
+                    onChange={(e) => setFormData({ ...formData, contactOption: e.target.value, email: '' })}
+                  />
+                  <span>Mobile Number</span>
+                </label>
+              </div>
             </div>
+
+            {formData.contactOption === 'email' && (
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="border-gray-300 focus:border-black focus:ring-black"
+                />
+              </div>
+            )}
+
+            {formData.contactOption === 'mobile' && (
+              <div className="space-y-2">
+                <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">Mobile Number</Label>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  placeholder="Enter your mobile number"
+                  value={formData.mobile}
+                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                  required
+                  className="border-gray-300 focus:border-black focus:ring-black"
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
               <Input
@@ -67,6 +114,7 @@ export default function SellerLogin() {
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
+
             <Button type="submit" className="w-full bg-black hover:bg-gray-800 text-white">
               Login
             </Button>
@@ -76,4 +124,3 @@ export default function SellerLogin() {
     </div>
   )
 }
-
