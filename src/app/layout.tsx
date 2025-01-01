@@ -4,8 +4,9 @@ import "./globals.css";
 import { usePathname } from "next/navigation";
 import { Footer } from "@/component/user/Footer/footer";
 import { useState, useEffect } from "react";
-import { Navbar } from '@/components/navbar';
+import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
+import CouponPage from "@/component/admin/CouponPage/CouponPage"; // Import CouponPage
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,21 +76,21 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-    <AuthProvider>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {!isAdminRoute && (
-          <Navbar
-            cartItemCount={cartItemCount}
-            isMenuOpen={isMenuOpen}
-            toggleMenu={toggleMenu}
-          />
-        )}
-        {children}
-        {!isAdminRoute && <Footer />}
-      </body>
-    </AuthProvider>
+      <AuthProvider>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {!isAdminRoute && (
+            <Navbar
+              cartItemCount={cartItemCount}
+              isMenuOpen={isMenuOpen}
+              toggleMenu={toggleMenu}
+            />
+          )}
+          {isAdminRoute ? <CouponPage /> : children}
+          {!isAdminRoute && <Footer />}
+        </body>
+      </AuthProvider>
     </html>
   );
 }
