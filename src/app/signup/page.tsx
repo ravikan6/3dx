@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { User, Mail, Phone, Lock } from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -47,15 +48,18 @@ export default function SignupPage() {
             >
               Name
             </Label>
-            <Input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Enter your name"
-              required
-            />
+            <div className="flex items-center space-x-2">
+              <User className="h-4 w-4 text-gray-700" />
+              <Input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
           </div>
           <div className="mb-4">
             <Label
@@ -64,15 +68,18 @@ export default function SignupPage() {
             >
               Email
             </Label>
-            <Input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Enter your email"
-              required
-            />
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4 text-gray-700" />
+              <Input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
           </div>
           <div className="mb-4">
             <Label
@@ -81,15 +88,18 @@ export default function SignupPage() {
             >
               Phone Number
             </Label>
-            <Input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Enter your phone number"
-              required
-            />
+            <div className="flex items-center space-x-2">
+              <Phone className="h-4 w-4 text-gray-700" />
+              <Input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
           </div>
           <div className="mb-6">
             <Label
@@ -98,15 +108,18 @@ export default function SignupPage() {
             >
               Password
             </Label>
-            <Input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Enter your password"
-              required
-            />
+            <div className="flex items-center space-x-2">
+              <Lock className="h-4 w-4 text-gray-700" />
+              <Input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
           </div>
           {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
           <div className="flex items-center justify-between">

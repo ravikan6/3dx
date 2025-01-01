@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Store } from 'lucide-react'
+import { Store, Mail, Phone, Lock } from 'lucide-react'
 
 export default function SellerLogin() {
   const [formData, setFormData] = useState({
@@ -35,15 +35,17 @@ export default function SellerLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="sellerId" className="text-sm font-medium text-gray-700">Seller ID</Label>
-              <Input
-                id="sellerId"
-                type="text"
-                placeholder="Enter your seller ID"
-                value={formData.sellerId}
-                onChange={(e) => setFormData({ ...formData, sellerId: e.target.value })}
-                required
-                className="border-gray-300 focus:border-black focus:ring-black"
-              />
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="sellerId"
+                  type="text"
+                  placeholder="Enter your seller ID"
+                  value={formData.sellerId}
+                  onChange={(e) => setFormData({ ...formData, sellerId: e.target.value })}
+                  required
+                  className="border-gray-300 focus:border-black focus:ring-black"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -57,7 +59,10 @@ export default function SellerLogin() {
                     checked={formData.contactOption === 'email'}
                     onChange={(e) => setFormData({ ...formData, contactOption: e.target.value, mobile: '' })}
                   />
-                  <span>Email</span>
+                  <span className="flex items-center space-x-1">
+                    <Mail className="h-4 w-4 text-gray-700" />
+                    <span>Email</span>
+                  </span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input
@@ -67,7 +72,10 @@ export default function SellerLogin() {
                     checked={formData.contactOption === 'mobile'}
                     onChange={(e) => setFormData({ ...formData, contactOption: e.target.value, email: '' })}
                   />
-                  <span>Mobile Number</span>
+                  <span className="flex items-center space-x-1">
+                    <Phone className="h-4 w-4 text-gray-700" />
+                    <span>Mobile Number</span>
+                  </span>
                 </label>
               </div>
             </div>
@@ -75,44 +83,53 @@ export default function SellerLogin() {
             {formData.contactOption === 'email' && (
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  className="border-gray-300 focus:border-black focus:ring-black"
-                />
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 text-gray-700" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    className="border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
               </div>
             )}
 
             {formData.contactOption === 'mobile' && (
               <div className="space-y-2">
                 <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">Mobile Number</Label>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  placeholder="Enter your mobile number"
-                  value={formData.mobile}
-                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                  required
-                  className="border-gray-300 focus:border-black focus:ring-black"
-                />
+                <div className="flex items-center space-x-2">
+                  <Phone className="h-4 w-4 text-gray-700" />
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    placeholder="Enter your mobile number"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    required
+                    className="border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
               </div>
             )}
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                className="border-gray-300 focus:border-black focus:ring-black"
-              />
+              <div className="flex items-center space-x-2">
+                <Lock className="h-4 w-4 text-gray-700" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                  className="border-gray-300 focus:border-black focus:ring-black"
+                />
+              </div>
             </div>
 
             <Button type="submit" className="w-full bg-black hover:bg-gray-800 text-white">
