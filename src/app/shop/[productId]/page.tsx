@@ -31,6 +31,7 @@ export default function ProductDetail() {
         }
       } catch (err) {
         setError("Failed to load product");
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }

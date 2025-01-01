@@ -26,6 +26,7 @@ export default function SignupPage() {
       router.push("/"); // Redirect to dashboard after successful signup
     } catch (err) {
       setError("Failed to create an account. Please try again.");
+      console.log(err);
     }
   };
 

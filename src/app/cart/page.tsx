@@ -24,7 +24,6 @@ type SectionCardProps = {
 const SectionCard: React.FC<SectionCardProps> = ({
   title,
   children,
-  className = "",
   dataAos = "",
 }) => (
   <div
@@ -121,7 +120,7 @@ const Cart: React.FC = () => {
           return;
         }
 
-        let productsInCart = JSON.parse(cartData.cart.productsInCart);
+        const productsInCart = JSON.parse(cartData.cart.productsInCart);
 
         // Filter out duplicates based on productId
         const uniqueProducts = productsInCart.filter(

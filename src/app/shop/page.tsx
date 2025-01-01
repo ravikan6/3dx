@@ -35,6 +35,7 @@ export default function ProductsPage() {
         setProducts(data.products)
       } catch (err) {
         setError('Failed to load products')
+        console.log(err)
       } finally {
         setLoading(false)
       }

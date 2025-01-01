@@ -113,14 +113,14 @@ export function Sidebar({ className }: { className?: string }) {
 
       <div className="mt-auto p-2 border-t">
         <Link href="/admin/add-product" passHref>
-          <Button
-            as={motion.a}
+          <motion.a
             whileHover={{ scale: 1.05 }}
-            variant="ghost"
-            className="w-full justify-center h-9 px-2 text-sm font-normal mb-2"
+            className={cn(
+              'w-full justify-center h-9 px-2 text-sm font-normal mb-2 inline-flex items-center text-muted-foreground'
+            )}
           >
             Add Product
-          </Button>
+          </motion.a>
         </Link>
         <div className="flex items-center justify-between mb-2">
           <div>

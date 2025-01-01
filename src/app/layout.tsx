@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import CouponPage from "@/component/admin/CouponPage/CouponPage"; // Import CouponPage
+import { useRouter } from "next/router"; // Import useRouter
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,12 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isAdminRoute = pathname.startsWith("/admin");
-
-  // State for managing mobile menu in Navbar
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false); // Track if component is mounted on client
   const [cartItemCount, setCartItemCount] = useState<number>(0);
 
+  useEffect(() => {
+    setIsClient(true); // Set client-side rendering flag after mount
+  }, []);
+
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isCouponPage = pathname === "/admin/coupon";
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
   };
@@ -74,12 +80,17 @@ export default function RootLayout({
     }
   }, []);
 
+  if (!isClient) {
+    return null; // Prevent rendering the layout until client-side
+  }
+
   return (
     <html lang="en">
       <AuthProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          {/* Only show the Navbar for non-admin routes */}
           {!isAdminRoute && (
             <Navbar
               cartItemCount={cartItemCount}
@@ -87,7 +98,21 @@ export default function RootLayout({
               toggleMenu={toggleMenu}
             />
           )}
-          {isAdminRoute ? <CouponPage /> : children}
+
+          {/* Conditionally render CouponPage for /admin/coupon route */}
+          {isCouponPage ? (
+            // Render CouponPage only for /admin/coupon
+            <CouponPage />
+          ) : (
+            // Render the children for other admin pages or routes
+            isAdminRoute ? (
+              <div>{children}</div> // Admin pages content will go here
+            ) : (
+              children
+            )
+          )}
+
+          {/* Only show Footer for non-admin routes */}
           {!isAdminRoute && <Footer />}
         </body>
       </AuthProvider>

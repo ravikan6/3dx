@@ -1,8 +1,8 @@
-import { Sidebar } from "./components/sidebar"
-import { Header } from "./components/header"
-import { OverviewCards } from "./components/overview-cards"
-import { AnalyticsChart } from "./components/analytics-chart"
-import { TopProducts } from "./components/top-products"
+import { Sidebar } from "./sidebar"
+import { Header } from "./header"
+import { OverviewCards } from "./overview-cards"
+import { AnalyticsChart } from "./analytics-chart"
+import { TopProducts } from "./top-products"
 import { Button } from "@/components/ui/button"
 import { Plus } from 'lucide-react'
 
