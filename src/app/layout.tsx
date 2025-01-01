@@ -9,13 +9,16 @@ import { AuthProvider } from "@/context/AuthContext";
 import CouponPage from "@/component/admin/CouponPage/CouponPage";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const isAdminRoute = pathname.startsWith("/admin");
-  const isCouponPage = pathname === "/admin/coupon";
+  const isCouponPage = pathname.startsWith("/admin/coupon");  // Updated to handle possible query params
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -25,18 +28,23 @@ export default function RootLayout({ children }) {
     if (userId) {
       const fetchCartData = async () => {
         try {
-          const response = await fetch("https://backend3dx.onrender.com/cart/get-cart", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
-          });
+          const response = await fetch(
+            "https://backend3dx.onrender.com/cart/get-cart",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId }),
+            }
+          );
 
           if (!response.ok) throw new Error("Failed to fetch cart data");
 
           const data = await response.json();
           if (data.success) {
             const productsInCart = JSON.parse(data.cart.productsInCart);
-            const uniqueProductIds = [...new Set(productsInCart.map((item) => item.productId))];
+            const uniqueProductIds = [
+              ...new Set(productsInCart.map((item) => item.productId)),
+            ];
             setCartItemCount(uniqueProductIds.length);
           } else {
             setCartItemCount(0);
@@ -51,19 +59,25 @@ export default function RootLayout({ children }) {
     } else {
       setCartItemCount(0);
     }
-  }, []);
+  }, [pathname]); // Fixed dependency array to be stable with 'pathname'
 
   return (
     <html lang="en">
       <AuthProvider>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
           {!isAdminRoute && (
-            <Navbar cartItemCount={cartItemCount} isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+            <Navbar
+              cartItemCount={cartItemCount}
+              isMenuOpen={isMenuOpen}
+              toggleMenu={toggleMenu}
+            />
           )}
           {isCouponPage ? (
             <CouponPage />
           ) : isAdminRoute ? (
-            <div>{children}</div>
+            <div>{children}</div> // This div seems unnecessary unless you're adding styling here
           ) : (
             children
           )}
