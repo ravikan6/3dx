@@ -171,10 +171,11 @@ const Checkout: React.FC = () => {
       );
 
       const orderPayload = {
-        amount: Math.round(totalAmount * 100), // Convert to paise
+        order_id: `order_${Date.now()}`, // Generate a unique order ID
+        amount: totalAmount,
         currency: "INR",
         receipt: `order_rcptid_${Date.now()}`,
-        notes: {},
+        status: "created", // Default status
         userId: userId,
         orderedProducts: cartItems.map((item) => ({
           productId: item.id,
@@ -184,8 +185,8 @@ const Checkout: React.FC = () => {
         shippingAddress: address, // Include the address in the order payload
       };
 
-      const createOrderResponse = await fetch(
-        "https://backend3dx.onrender.com/order/create-order",
+      const saveOrderResponse = await fetch(
+        "https://backend3dx.onrender.com/order/save-orders",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -193,39 +194,17 @@ const Checkout: React.FC = () => {
         }
       );
 
-      const orderData = await createOrderResponse.json();
+      const orderData = await saveOrderResponse.json();
 
       if (orderData.success) {
-        // Simulate payment process (replace this with actual Razorpay integration)
-        const paymentData = {
-          razorpay_order_id: orderData.order.id,
-          razorpay_payment_id: `pay_${Date.now()}`,
-          razorpay_signature: "simulated_signature",
-        };
-
-        const verifyPaymentResponse = await fetch(
-          "https://backend3dx.onrender.com/order/verify-payment",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(paymentData),
-          }
-        );
-
-        const verificationData = await verifyPaymentResponse.json();
-
-        if (verificationData.success) {
-          setPaymentResponse("Payment successful! Your order has been placed.");
-        } else {
-          setPaymentResponse("Payment verification failed. Please try again.");
-        }
+        setPaymentResponse("Order saved successfully! Your order has been placed.");
       } else {
-        setPaymentResponse("Failed to create order. Please try again.");
+        setPaymentResponse("Failed to save order. Please try again.");
       }
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error saving order:", error);
       setPaymentResponse(
-        "An error occurred while processing your payment. Please try again."
+        "An error occurred while saving your order. Please try again."
       );
     } finally {
       setLoading((prev) => ({ ...prev, payment: false }));
@@ -256,7 +235,7 @@ const Checkout: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
-          <p>Processing your payment...</p>
+          <p>Processing your order...</p>
         </div>
       </div>
     );
