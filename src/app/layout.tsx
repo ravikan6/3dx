@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import CouponPage from "@/component/admin/CouponPage/CouponPage";
-import Customer from '@/component/admin/customer/customer';
 
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });

@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Sidebar } from "@/component/admin/sidebar/sidebar";
+import { Sidebar } from "@/components/sidebar";
 
 interface Product {
   productId: string;

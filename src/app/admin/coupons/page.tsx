@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/component/admin/sidebar/sidebar";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -69,9 +69,8 @@ export default function CouponPage() {
     <div className="flex min-h-screen bg-gray-50">
       
       <div className="hidden w-64 border-r bg-white md:block">
-        <Sidebar />
+      <Sidebar />
       </div>
-
    
       <div className="flex-1 p-8 space-y-6">
         <div className="flex items-center justify-between mb-6">
