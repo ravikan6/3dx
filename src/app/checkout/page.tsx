@@ -2,23 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import AddressForm from "@/components/AddressForm";
+import OrderSummary from "@/components/OrderSummary";
+import SavedAddressesDialog from "@/components/SavedAddressesDialog";
 
 type Address = {
-  street: string;
+  streetAddress: string;
   city: string;
   state: string;
   pincode: string;
-  phone: string;
+  phoneNumber: string;
 };
 
 type CartItem = {
@@ -32,31 +26,36 @@ type CartItem = {
 const Checkout: React.FC = () => {
   const router = useRouter();
   const [address, setAddress] = useState<Address>({
-    street: "",
+    streetAddress: "",
     city: "",
     state: "",
     pincode: "",
-    phone: "",
+    phoneNumber: "",
   });
   const [saveAddress, setSaveAddress] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState({ address: true, cart: true });
+  const [loading, setLoading] = useState({
+    address: true,
+    cart: true,
+    payment: false,
+  });
   const [error, setError] = useState<string | null>(null);
+  const [paymentResponse, setPaymentResponse] = useState<string | null>(null);
 
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
     if (!userId) {
       setError("Please log in to proceed with checkout.");
-      setLoading({ address: false, cart: false });
+      setLoading({ address: false, cart: false, payment: false });
       return;
     }
 
     const fetchAddresses = async () => {
       try {
         const addressResponse = await fetch(
-          "https://backend3dx.onrender.com/fetch-address",
+          "https://backend3dx.onrender.com/address/fetch-address",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -70,7 +69,6 @@ const Checkout: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching addresses:", error);
-        // We don't set a global error here, as we want the checkout to continue
       } finally {
         setLoading((prev) => ({ ...prev, address: false }));
       }
@@ -126,27 +124,19 @@ const Checkout: React.FC = () => {
     fetchCartData();
   }, []);
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setAddress((prevAddress) => ({
-      ...prevAddress,
-      [name]: value,
-    }));
-  };
-
   const handleSaveAddress = async () => {
-    if (!saveAddress) return;
+    if (!saveAddress) return; // Only proceed if saveAddress is true
 
     const userId = sessionStorage.getItem("userId");
     if (!userId) return;
 
     try {
       const response = await fetch(
-        "https://backend3dx.onrender.com/address-save",
+        "https://backend3dx.onrender.com/address/save-address",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId, address }),
+          body: JSON.stringify({ userId, ...address }),
         }
       );
       const data = await response.json();
@@ -162,7 +152,9 @@ const Checkout: React.FC = () => {
   };
 
   const handleCheckout = async () => {
-    await handleSaveAddress();
+    if (saveAddress) {
+      await handleSaveAddress();
+    }
 
     const userId = sessionStorage.getItem("userId");
     if (!userId) {
@@ -170,42 +162,75 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    setLoading((prev) => ({ ...prev, payment: true }));
+
     try {
-      // Make API calls for each item in the cart
-      const orderPromises = cartItems.map((item) =>
-        fetch("https://backend3dx.onrender.com/order/order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          }),
-        }).then((res) => res.json())
+      const totalAmount = cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
       );
 
-      const results = await Promise.all(orderPromises);
+      const orderPayload = {
+        amount: Math.round(totalAmount * 100), // Convert to paise
+        currency: "INR",
+        receipt: `order_rcptid_${Date.now()}`,
+        notes: {},
+        userId: userId,
+        orderedProducts: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        shippingAddress: address, // Include the address in the order payload
+      };
 
-      // Check if all orders were successful
-      const allOrdersSuccessful = results.every((result) => result.success);
+      const createOrderResponse = await fetch(
+        "https://backend3dx.onrender.com/order/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderPayload),
+        }
+      );
 
-      if (allOrdersSuccessful) {
-        alert("Order was successful!");
-        router.push("/");
+      const orderData = await createOrderResponse.json();
+
+      if (orderData.success) {
+        // Simulate payment process (replace this with actual Razorpay integration)
+        const paymentData = {
+          razorpay_order_id: orderData.order.id,
+          razorpay_payment_id: `pay_${Date.now()}`,
+          razorpay_signature: "simulated_signature",
+        };
+
+        const verifyPaymentResponse = await fetch(
+          "https://backend3dx.onrender.com/order/verify-payment",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(paymentData),
+          }
+        );
+
+        const verificationData = await verifyPaymentResponse.json();
+
+        if (verificationData.success) {
+          setPaymentResponse("Payment successful! Your order has been placed.");
+        } else {
+          setPaymentResponse("Payment verification failed. Please try again.");
+        }
       } else {
-        alert("There was an issue processing your order. Please try again.");
+        setPaymentResponse("Failed to create order. Please try again.");
       }
     } catch (error) {
-      console.error("Error processing order:", error);
-      alert("An error occurred while processing your order. Please try again.");
+      console.error("Error processing payment:", error);
+      setPaymentResponse(
+        "An error occurred while processing your payment. Please try again."
+      );
+    } finally {
+      setLoading((prev) => ({ ...prev, payment: false }));
     }
   };
-
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
 
   if (loading.address || loading.cart) {
     return (
@@ -221,6 +246,28 @@ const Checkout: React.FC = () => {
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <Button onClick={() => router.push("/login")}>Go to Login</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading.payment) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+          <p>Processing your payment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentResponse) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-xl mb-4">{paymentResponse}</p>
+          <Button onClick={() => router.push("/")}>Return to Home</Button>
         </div>
       </div>
     );
@@ -242,102 +289,13 @@ const Checkout: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Address Section */}
-          <div className="bg-white rounded-3xl p-8 shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Shipping Address
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="street">Street Address</Label>
-                <Input
-                  id="street"
-                  name="street"
-                  value={address.street}
-                  onChange={handleAddressChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={address.city}
-                  onChange={handleAddressChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  value={address.state}
-                  onChange={handleAddressChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pincode">Pincode</Label>
-                <Input
-                  id="pincode"
-                  name="pincode"
-                  value={address.pincode}
-                  onChange={handleAddressChange}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={address.phone}
-                  onChange={handleAddressChange}
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center space-x-2">
-              <Checkbox
-                id="saveAddress"
-                checked={saveAddress}
-                onCheckedChange={(checked) =>
-                  setSaveAddress(checked as boolean)
-                }
-              />
-              <label
-                htmlFor="saveAddress"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Save address for future use
-              </label>
-            </div>
-          </div>
-
-          {/* Order Summary Section */}
-          <div className="bg-white rounded-3xl p-8 shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Order Summary
-            </h2>
-            <div className="text-gray-600 leading-relaxed">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex justify-between mb-4">
-                  <span>
-                    {item.name} (x{item.quantity})
-                  </span>
-                  <span>Rs.{(item.price * item.quantity).toFixed(2)}</span>
-                </div>
-              ))}
-              <p className="flex justify-between mb-4">
-                <span>Subtotal:</span> <span>Rs.{totalAmount.toFixed(2)}</span>
-              </p>
-              <p className="flex justify-between mb-4">
-                <span>Shipping:</span> <span>Rs.5.99</span>
-              </p>
-              <p className="flex justify-between font-bold text-lg text-gray-800">
-                <span>Total:</span>{" "}
-                <span>Rs.{(totalAmount + 5.99).toFixed(2)}</span>
-              </p>
-            </div>
-          </div>
+          <AddressForm
+            address={address}
+            setAddress={setAddress}
+            saveAddress={saveAddress}
+            setSaveAddress={setSaveAddress}
+          />
+          <OrderSummary cartItems={cartItems} />
         </div>
 
         {/* Checkout Button */}
@@ -348,38 +306,12 @@ const Checkout: React.FC = () => {
         </div>
       </div>
 
-      {/* Saved Addresses Dialog */}
-      <Dialog open={showAddressDialog} onOpenChange={setShowAddressDialog}>
-        <DialogContent>
-          <DialogTitle>Saved Addresses</DialogTitle>
-          <DialogDescription>
-            Select an address or enter a new one.
-          </DialogDescription>
-          {savedAddresses.map((savedAddress, index) => (
-            <div key={index} className="mb-4 p-4 border rounded">
-              <h3 className="font-bold">Address {index + 1}</h3>
-              <p>
-                {savedAddress.street}, {savedAddress.city}
-              </p>
-              <p>
-                {savedAddress.state}, {savedAddress.pincode}
-              </p>
-              <p>Phone: {savedAddress.phone}</p>
-              <Button
-                onClick={() => {
-                  setAddress(savedAddress);
-                  setShowAddressDialog(false);
-                }}
-              >
-                Use This Address
-              </Button>
-            </div>
-          ))}
-          <Button onClick={() => setShowAddressDialog(false)}>
-            Enter New Address
-          </Button>
-        </DialogContent>
-      </Dialog>
+      <SavedAddressesDialog
+        showAddressDialog={showAddressDialog}
+        setShowAddressDialog={setShowAddressDialog}
+        savedAddresses={savedAddresses}
+        setAddress={setAddress}
+      />
     </div>
   );
 };

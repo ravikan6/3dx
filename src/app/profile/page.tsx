@@ -1,54 +1,88 @@
 "use client";
 
-import { useState } from "react";
-import { User, Mail, Phone, MapPin, Save, Edit2, Camera } from "lucide-react"; // Added Camera icon
+import { useState, useEffect } from "react";
+import { User, Mail, Phone, MapPin, Save, Edit2 } from 'lucide-react';
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { fetchUserAddress, fetchUserDetails } from "@/utils/api";
+import PersonalInformation from "./PersonalInformation";
+import ShippingAddresses from "./ShippingAddresses";
+
+type Address = {
+  id: string;
+  type: string;
+  address: string;
+  isDefault: boolean;
+};
+
+type ProfileData = {
+  name: string;
+  email: string;
+  phone: string;
+  shippingAddresses: Address[];
+};
 
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "Enter Your Full Name",
-    email: "example@gmail.com",
-    phone: "+1 (555) 123-4567",
-    address: "Enter Your Address",
-    profilePicture: "/path/to/default/profile.jpg", // Added default profile picture
-    shippingAddresses: [
-      {
-        id: 1,
-        type: "Home",
-        address: "123 Main Street, Apt 4B, New York, NY 10001",
-        isDefault: true,
-      },
-      {
-        id: 2,
-        type: "Office",
-        address: "456 Business Ave, Suite 200, New York, NY 10002",
-        isDefault: false,
-      },
-    ],
+  const [profileData, setProfileData] = useState<ProfileData>({
+    name: "",
+    email: "",
+    phone: "",
+    shippingAddresses: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Handle profile picture change
-  const handleProfilePictureChange = (e:any) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileData({
-          ...profileData,
-          // profilePicture: reader.result, // Update profile picture with the selected image
-        });
-      };
-      reader.readAsDataURL(file);
+  useEffect(() => {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+      setError("User ID not found. Please log in.");
+      setLoading(false);
+      return;
     }
-  };
+
+    const fetchData = async () => {
+      try {
+        const [userDetails, userAddress] = await Promise.all([
+          fetchUserDetails(userId),
+          fetchUserAddress(userId),
+        ]);
+
+        setProfileData({
+          name: userDetails.name,
+          email: userDetails.email,
+          phone: userDetails.phone || "",
+          shippingAddresses: userAddress.addresses.map((addr: any) => ({
+            id: addr.id,
+            type: addr.type || "Home",
+            address: `${addr.streetAddress}, ${addr.city}, ${addr.state}, ${addr.pincode}`,
+            isDefault: addr.isDefault || false,
+          })),
+        });
+      } catch (err) {
+        setError("Failed to fetch user data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onSaveProfile = () => {
     // Logic to handle profile update
     console.log("Profile updated:", profileData);
     alert("Profile updated successfully!");
+    setIsEditing(false);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
@@ -59,7 +93,6 @@ export default function MyProfile() {
           transition={{ duration: 0.5 }}
           className="bg-white shadow-sm rounded-lg overflow-hidden"
         >
-          {/* Profile Content */}
           <div className="pt-8 pb-8 px-8">
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -71,7 +104,7 @@ export default function MyProfile() {
               <button
                 onClick={() => {
                   if (isEditing) onSaveProfile();
-                  setIsEditing(!isEditing);
+                  else setIsEditing(true);
                 }}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
@@ -89,159 +122,23 @@ export default function MyProfile() {
               </button>
             </div>
 
-            {/* Profile Picture Section */}
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="relative">
-                <img
-                  src={profileData.profilePicture}
-                  alt="Profile Picture"
-                  className="h-24 w-24 rounded-full object-cover"
-                />
-                {isEditing && (
-                  <label
-                    htmlFor="profile-picture-upload"
-                    className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white cursor-pointer"
-                  >
-                    <Camera className="h-5 w-5" />
-                  </label>
-                )}
-              </div>
-              {isEditing && (
-                <input
-                  type="file"
-                  id="profile-picture-upload"
-                  accept="image/*"
-                  onChange={handleProfilePictureChange}
-                  className="hidden"
-                />
-              )}
-            </div>
-
-            {/* Personal Information */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="space-y-6"
             >
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Personal Information
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Full Name
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <User className="h-5 w-5 text-gray-400 mr-2" />
-                      <input
-                        type="text"
-                        disabled={!isEditing}
-                        value={profileData.name}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            name: e.target.value,
-                          })
-                        }
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm disabled:bg-gray-50 disabled:text-gray-500"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <Mail className="h-5 w-5 text-gray-400 mr-2" />
-                      <input
-                        type="email"
-                        disabled={!isEditing}
-                        value={profileData.email}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            email: e.target.value,
-                          })
-                        }
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm disabled:bg-gray-50 disabled:text-gray-500"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Phone Number
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <Phone className="h-5 w-5 text-gray-400 mr-2" />
-                      <input
-                        type="tel"
-                        disabled={!isEditing}
-                        value={profileData.phone}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            phone: e.target.value,
-                          })
-                        }
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm disabled:bg-gray-50 disabled:text-gray-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <PersonalInformation
+                profileData={profileData}
+                setProfileData={setProfileData}
+                isEditing={isEditing}
+              />
 
-              {/* Shipping Addresses */}
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Shipping Addresses
-                </h2>
-                <div className="space-y-4">
-                  {profileData.shippingAddresses.map((address) => (
-                    <motion.div
-                      key={address.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      className="border border-gray-200 rounded-lg p-4"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3">
-                          <MapPin className="h-5 w-5 text-gray-400 mt-1" />
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="font-medium text-gray-900">
-                                {address.type}
-                              </span>
-                              {address.isDefault && (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                  Default
-                                </span>
-                              )}
-                            </div>
-                            <p className="mt-1 text-sm text-gray-500">
-                              {address.address}
-                            </p>
-                          </div>
-                        </div>
-                        {isEditing && (
-                          <button className="text-sm text-gray-600 hover:text-gray-900">
-                            Edit
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                  {isEditing && (
-                    <button className="block w-full text-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-400">
-                      + Add New Address
-                    </button>
-                  )}
-                </div>
-              </div>
+              <ShippingAddresses
+                addresses={profileData.shippingAddresses}
+                isEditing={isEditing}
+              />
 
-              {/* Password Change Section */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Security
@@ -252,7 +149,6 @@ export default function MyProfile() {
               </div>
             </motion.div>
 
-            {/* Link to Signup Page */}
             <div className="mt-8">
               <Link
                 href={{
@@ -274,3 +170,4 @@ export default function MyProfile() {
     </main>
   );
 }
+
