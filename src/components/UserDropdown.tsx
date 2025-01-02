@@ -25,7 +25,7 @@ export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps
   ];
 
   const loggedInItems: UserDropdownItem[] = [
-    // { name: 'My Profile', href: '/profile', icon: RiUser3Line },
+    { name: 'My Profile', href: '/profile', icon: RiUser3Line },
     { name: 'My Orders', href: '/orders', icon: RiFileList3Line },
     { name: 'Logout', href: '#', icon: RiLogoutBoxRLine, onClick: onLogout }, // onClick defined here
   ];
