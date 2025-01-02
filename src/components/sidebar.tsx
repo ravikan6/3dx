@@ -9,10 +9,10 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="p-6">
         <div className="flex items-center gap-2 mb-8">
           <div className="h-8 w-8 bg-black rounded-lg flex items-center justify-center">
-            <span className="text-white text-xs">V</span>
+            <span className="text-white text-xs">3D</span>
           </div>
           <h2 className="text-sm font-semibold">
-            Veselty Inc.
+            3D.XYZ
           </h2>
         </div>
         
