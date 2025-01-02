@@ -103,7 +103,9 @@ export default function ContactPage() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-800">
                   Let's Chat, Reach Out to Us
                 </span>
-                <span className="text-gray-800 block text-3xl mt-2">We'd love to hear from you</span>
+                <span className="text-gray-800 block text-3xl mt-2">
+                  We'd love to hear from you
+                </span>
               </h1>
               <p className="text-gray-600">
                 Have questions or feedback? We&apos;re here to help. Send us a
@@ -207,7 +209,7 @@ export default function ContactPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-gray-800 hover:bg-gray-900 text-white"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Sending..." : "Send Message"}
@@ -240,7 +242,7 @@ export default function ContactPage() {
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <Mail className="h-6 w-6 text-blue-600" />
+                  <Mail className="h-6 w-6 text-black-600" />
                 </div>
                 <div>
                   <h3 className="font-medium">Email</h3>
@@ -250,7 +252,7 @@ export default function ContactPage() {
 
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <Phone className="h-6 w-6 text-blue-600" />
+                  <Phone className="h-6 w-6 text-black-600" />
                 </div>
                 <div>
                   <h3 className="font-medium">Phone</h3>
