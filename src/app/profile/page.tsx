@@ -1,35 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Mail, Phone, MapPin, Save, Edit2 } from 'lucide-react';
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { fetchUserAddress, fetchUserDetails } from "@/utils/api";
-import PersonalInformation from "./PersonalInformation";
-import ShippingAddresses from "./ShippingAddresses";
 
 type Address = {
-  id: string;
-  type: string;
-  address: string;
-  isDefault: boolean;
+  id: number;
+  streetAddress: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phoneNumber: string;
 };
 
 type ProfileData = {
   name: string;
-  email: string;
-  phone: string;
-  shippingAddresses: Address[];
 };
 
 export default function MyProfile() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileData>({
-    name: "",
-    email: "",
-    phone: "",
-    shippingAddresses: [],
-  });
+  const [profileData, setProfileData] = useState<ProfileData>({ name: "" });
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,15 +41,16 @@ export default function MyProfile() {
 
         setProfileData({
           name: userDetails.name,
-          email: userDetails.email,
-          phone: userDetails.phone || "",
-          shippingAddresses: userAddress.addresses.map((addr: any) => ({
-            id: addr.id,
-            type: addr.type || "Home",
-            address: `${addr.streetAddress}, ${addr.city}, ${addr.state}, ${addr.pincode}`,
-            isDefault: addr.isDefault || false,
-          })),
         });
+
+        setAddresses(userAddress.map((addr: any) => ({
+          id: addr.id,
+          streetAddress: addr.streetAddress,
+          city: addr.city,
+          state: addr.state,
+          pincode: addr.pincode,
+          phoneNumber: addr.phoneNumber,
+        })));
       } catch (err) {
         setError("Failed to fetch user data. Please try again.");
       } finally {
@@ -68,13 +60,6 @@ export default function MyProfile() {
 
     fetchData();
   }, []);
-
-  const onSaveProfile = () => {
-    // Logic to handle profile update
-    console.log("Profile updated:", profileData);
-    alert("Profile updated successfully!");
-    setIsEditing(false);
-  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -101,25 +86,6 @@ export default function MyProfile() {
                   Manage your account details and preferences
                 </p>
               </div>
-              <button
-                onClick={() => {
-                  if (isEditing) onSaveProfile();
-                  else setIsEditing(true);
-                }}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                {isEditing ? (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </>
-                ) : (
-                  <>
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Edit Profile
-                  </>
-                )}
-              </button>
             </div>
 
             <motion.div
@@ -128,16 +94,41 @@ export default function MyProfile() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="space-y-6"
             >
-              <PersonalInformation
-                profileData={profileData}
-                setProfileData={setProfileData}
-                isEditing={isEditing}
-              />
+              {/* Display Profile Name */}
+              <div className="bg-gray-100 p-4 rounded-lg shadow-sm">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  Personal Information
+                </h2>
+                <p className="text-sm text-gray-700">
+                  <strong>Name:</strong> {profileData.name}
+                </p>
+              </div>
 
-              <ShippingAddresses
-                addresses={profileData.shippingAddresses}
-                isEditing={isEditing}
-              />
+              {/* Display Address Details */}
+              <div className="bg-gray-100 p-4 rounded-lg shadow-sm">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  Address Saved
+                </h2>
+                {addresses.map((address) => (
+                  <div key={address.id} className="mb-4">
+                    <p className="text-sm text-gray-700">
+                      <strong>Street Address:</strong> {address.streetAddress}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>City:</strong> {address.city}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>State:</strong> {address.state}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>Pincode:</strong> {address.pincode}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>Phone Number:</strong> {address.phoneNumber}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -155,8 +146,6 @@ export default function MyProfile() {
                   pathname: "/signup",
                   query: {
                     name: profileData.name,
-                    email: profileData.email,
-                    phone: profileData.phone,
                   },
                 }}
                 className="text-indigo-600 hover:text-indigo-800 underline"
@@ -170,4 +159,3 @@ export default function MyProfile() {
     </main>
   );
 }
-
