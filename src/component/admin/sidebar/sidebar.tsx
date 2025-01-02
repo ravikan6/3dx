@@ -17,7 +17,9 @@ export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <div className={cn("flex flex-col h-full bg-white overflow-hidden", className)}>
+    <div
+      className={cn("flex flex-col h-full bg-white overflow-hidden", className)}
+    >
       <div className="p-2">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -30,13 +32,19 @@ export function Sidebar({ className }: { className?: string }) {
 
         <div className="space-y-4">
           <div>
-            <h3 className="text-xs font-medium text-muted-foreground mb-2">MAIN MENU</h3>
+            <h3 className="text-xs font-medium text-muted-foreground mb-2">
+              MAIN MENU
+            </h3>
             <div className="space-y-1">
               {[
                 { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
                 { href: "/admin/products", icon: Package, label: "Products" },
                 { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-                { href: "/admin/complaints", icon: MessageCircle, label: "Complaints" },
+                {
+                  href: "/admin/complaints",
+                  icon: MessageCircle,
+                  label: "Complaints",
+                },
                 { href: "/admin/customers", icon: Users, label: "Customers" }, // Customers page route added
                 { href: "/admin/coupons", icon: Tag, label: "Coupons" },
               ].map((item) => (
@@ -70,7 +78,7 @@ export function Sidebar({ className }: { className?: string }) {
           <motion.a
             whileHover={{ scale: 1.05 }}
             className={cn(
-              'w-full justify-center h-9 px-2 text-sm font-normal mb-2 inline-flex items-center text-muted-foreground'
+              "w-full justify-center h-9 px-2 text-sm font-normal mb-2 inline-flex items-center text-muted-foreground"
             )}
           >
             Add Product

@@ -6,8 +6,6 @@ import { Footer } from "@/component/user/Footer/footer";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
-import CouponPage from "@/component/admin/CouponPage/CouponPage";
-
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -19,7 +17,6 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const isAdminRoute = pathname.startsWith("/admin");
-  const isCouponPage = pathname.startsWith("/admin/coupon");  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -68,20 +65,17 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {!isAdminRoute && (
-            <Navbar
-              cartItemCount={cartItemCount}
-              isMenuOpen={isMenuOpen}
-              toggleMenu={toggleMenu}
-            />
-          )}
-          {isCouponPage ? (
-            <CouponPage />
-          ) : isAdminRoute ? (
-            <div>{children}</div> // This div seems unnecessary unless you're adding styling here
-          ) : (
-            children
-          )}
+          {/* Main content area */}
+          <div className="p-8 space-y-6">
+            {!isAdminRoute && (
+              <Navbar
+                cartItemCount={cartItemCount}
+                isMenuOpen={isMenuOpen}
+                toggleMenu={toggleMenu}
+              />
+            )}
+            {children} {/* Render the dynamic content here */}
+          </div>
           {!isAdminRoute && <Footer />}
         </body>
       </AuthProvider>
