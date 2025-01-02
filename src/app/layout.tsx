@@ -17,6 +17,7 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const isAdminRoute = pathname.startsWith("/admin");
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -65,17 +66,21 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {/* Main content area */}
-          <div className="p-8 space-y-6">
-            {!isAdminRoute && (
-              <Navbar
-                cartItemCount={cartItemCount}
-                isMenuOpen={isMenuOpen}
-                toggleMenu={toggleMenu}
-              />
-            )}
-            {children} {/* Render the dynamic content here */}
-          </div>
+          {!isAdminRoute && (
+            <Navbar
+              cartItemCount={cartItemCount}
+              isMenuOpen={isMenuOpen}
+              toggleMenu={toggleMenu}
+            />
+          )}
+          
+          {/* Render children directly if not admin route */}
+          {isAdminRoute ? (
+            <div>{children}</div>
+          ) : (
+            children
+          )}
+
           {!isAdminRoute && <Footer />}
         </body>
       </AuthProvider>
