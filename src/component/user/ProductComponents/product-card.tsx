@@ -41,19 +41,17 @@ export function ProductCard({ product, view }: ProductCardProps) {
   };
 
   const cardClassName = view === "grid"
-    ? "w-[280px] h-[420px]" // Fixed dimensions for grid view
-    : "w-full h-[200px]";
+    ? "w-full h-[420px] flex flex-col" // Fixed height and flexible width in grid view
+    : "w-full min-h-[200px] flex flex-row"; // Flexible for list view
 
   const imageContainerClassName = view === "grid"
-    ? "h-[280px] w-full" // Fixed height for grid view
-    : "w-[200px] h-[200px]"; // Square dimensions for list view
+    ? "h-[280px] w-full flex-shrink-0" // Fixed image size for grid view
+    : "w-[200px] h-[200px] flex-shrink-0"; // Square image in list view
 
   return (
     <>
       <div
-        className={`group relative bg-card rounded-lg border shadow-sm overflow-hidden ${cardClassName} flex ${
-          view === "grid" ? "flex-col" : "flex-row"
-        }`}
+        className={`group relative bg-card rounded-lg border shadow-sm overflow-hidden ${cardClassName}`}
       >
         <Link 
           href={`/shop/${product.productId}`}
@@ -64,11 +62,7 @@ export function ProductCard({ product, view }: ProductCardProps) {
           </div>
         </Link>
 
-        <div className={`flex flex-col p-4 ${
-          view === "grid" 
-            ? "flex-1 justify-between" 
-            : "flex-1 justify-between ml-4"
-        }`}>
+        <div className={`flex flex-col p-4 ${view === "grid" ? "flex-grow" : "flex-1 ml-4"}`}>
           <div className="space-y-2">
             <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">
               {product.productName}
@@ -129,3 +123,14 @@ export function ProductCard({ product, view }: ProductCardProps) {
     </>
   );
 }
+
+// Parent container for product cards
+const ProductList = ({ products, view }: { products: Product[], view: "grid" | "list" }) => {
+  return (
+    <div className={`grid gap-4 ${view === "grid" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : ""}`}>
+      {products.map(product => (
+        <ProductCard key={product.productId} product={product} view={view} />
+      ))}
+    </div>
+  );
+};
