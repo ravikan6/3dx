@@ -12,11 +12,7 @@ export function Sidebar({ className }: { className?: string }) {
             <span className="text-white text-xs">3D</span>
           </div>
           <h2 className="text-sm font-semibold">
-<<<<<<< HEAD
             3D.XYZ
-=======
-            3D.xyz
->>>>>>> fe2c910b496be95d098545cef3cfde20b5f9d5a1
           </h2>
         </div>
         
@@ -86,4 +82,3 @@ export function Sidebar({ className }: { className?: string }) {
     </div>
   )
 }
-
