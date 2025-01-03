@@ -57,9 +57,9 @@ const CartItem: React.FC<{
       <div className="flex items-center justify-center sm:justify-start gap-4 mt-2">
         <button
           className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all disabled:opacity-50"
-          onClick={() =>
-            item.quantity > 1 &&
-            onUpdateQuantity(item.id, item.quantity - 1) // Decrement quantity
+          onClick={
+            () =>
+              item.quantity > 1 && onUpdateQuantity(item.id, item.quantity - 1) // Decrement quantity
           }
           disabled={item.quantity <= 1}
         >
@@ -129,29 +129,44 @@ const Cart: React.FC = () => {
         );
 
         // Fetch product details for each unique product
-        const products = await Promise.all(uniqueProducts.map(async (cartItem: any) => {
-          const productResponse = await fetch(
-            `https://backend3dx.onrender.com/product/product/${cartItem.productId}`
-          );
-          const productData = await productResponse.json();
+        const products = await Promise.all(
+          uniqueProducts.map(async (cartItem: any) => {
+            try {
+              const productResponse = await fetch(
+                `https://backend3dx.onrender.com/product/product/${cartItem.productId}`
+              );
+              const productData = await productResponse.json();
 
-          if (!productData.success) {
-            throw new Error(
-              `Failed to fetch product details for ID: ${cartItem.productId}`
-            );
-          }
+              if (!productData.success) {
+                console.warn(`Product not found for ID: ${cartItem.productId}`);
+                await handleDelete(cartItem.productId);
+                return null;
+              }
 
-          const product: Product = productData.product;
-          return {
-            id: cartItem.productId,
-            name: product.productName,
-            price: product.productPrice,
-            quantity: cartItem.productQty, // Changed from cartItem.quantity to cartItem.productQty
-            image: product.img[0],
-          };
-        }));
+              const product: Product = productData.product;
+              return {
+                id: cartItem.productId,
+                name: product.productName,
+                price: product.productPrice,
+                quantity: cartItem.productQty,
+                image: product.img[0],
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching product ${cartItem.productId}:`,
+                error
+              );
+              return null;
+            }
+          })
+        );
 
-        setCartItems(products);
+        // Filter out null values (products that weren't found)
+        setCartItems(
+          products.filter(
+            (product): product is CartItemProps => product !== null
+          )
+        );
       } catch (error) {
         console.error("Error fetching cart data:", error);
         setError(
@@ -194,7 +209,10 @@ const Cart: React.FC = () => {
     }
   };
 
-  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+  const handleUpdateQuantity = async (
+    productId: string,
+    newQuantity: number
+  ) => {
     const userId = sessionStorage.getItem("userId");
     if (!userId) return;
 
@@ -206,10 +224,10 @@ const Cart: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ 
-            userId, 
-            productId, 
-            productQty: newQuantity 
+          body: JSON.stringify({
+            userId,
+            productId,
+            productQty: newQuantity,
           }),
         }
       );
@@ -289,27 +307,40 @@ const Cart: React.FC = () => {
                 />
               ))
             ) : (
-              <p className="text-gray-600">Your cart is empty.</p>
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">
+                  Oops! You didn't add anything to your basket.
+                </p>
+                <button
+                  onClick={() => router.push("/shop")}
+                  className="px-6 py-3 bg-black text-white rounded-xl text-lg font-bold hover:bg-gray-800 transition-all"
+                >
+                  Let's Go Shop Now
+                </button>
+              </div>
             )}
           </SectionCard>
 
-          <SectionCard title="Order Summary" dataAos="fade-left">
-            <div className="text-gray-600 leading-relaxed">
-              <p className="flex justify-between mb-4">
-                <span>Subtotal:</span> <span>Rs.{totalAmount.toFixed(2)}</span>
-              </p>
-              <p className="flex justify-between font-bold text-lg text-gray-800">
-                <span>Total:</span>{" "}
-                <span>Rs.{(totalAmount + 0.00).toFixed(2)}</span>
-              </p>
-            </div>
-            <button
-              className="w-full mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl text-lg font-bold hover:bg-blue-600 transition-all"
-              onClick={() => router.push("/checkout")}
-            >
-              Proceed to Checkout
-            </button>
-          </SectionCard>
+          {cartItems.length > 0 && (
+            <SectionCard title="Order Summary" dataAos="fade-left">
+              <div className="text-gray-600 leading-relaxed">
+                <p className="flex justify-between mb-4">
+                  <span>Subtotal:</span>{" "}
+                  <span>Rs.{totalAmount.toFixed(2)}</span>
+                </p>
+                <p className="flex justify-between font-bold text-lg text-gray-800">
+                  <span>Total:</span>{" "}
+                  <span>Rs.{(totalAmount + 0.0).toFixed(2)}</span>
+                </p>
+              </div>
+              <button
+                className="w-full mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl text-lg font-bold hover:bg-blue-600 transition-all"
+                onClick={() => router.push("/checkout")}
+              >
+                Proceed to Checkout
+              </button>
+            </SectionCard>
+          )}
         </div>
       </div>
     </div>
@@ -317,4 +348,3 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
-
