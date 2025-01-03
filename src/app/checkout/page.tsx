@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import AddressForm from "@/components/AddressForm";
 import OrderSummary from "@/components/OrderSummary";
 import SavedAddressesDialog from "@/components/SavedAddressesDialog";
@@ -23,6 +24,12 @@ type CartItem = {
   image: string;
 };
 
+type Coupon = {
+  name: string;
+  code: string;
+  discountPercentage: number;
+};
+
 const Checkout: React.FC = () => {
   const router = useRouter();
   const [address, setAddress] = useState<Address>({
@@ -40,15 +47,19 @@ const Checkout: React.FC = () => {
     address: true,
     cart: true,
     payment: false,
+    coupon: false,
   });
   const [error, setError] = useState<string | null>(null);
   const [paymentResponse, setPaymentResponse] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState<string>("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
     if (!userId) {
       setError("Please log in to proceed with checkout.");
-      setLoading({ address: false, cart: false, payment: false });
+      setLoading({ address: false, cart: false, payment: false, coupon: false });
       return;
     }
 
@@ -125,7 +136,7 @@ const Checkout: React.FC = () => {
   }, []);
 
   const handleSaveAddress = async () => {
-    if (!saveAddress) return; // Only proceed if saveAddress is true
+    if (!saveAddress) return;
 
     const userId = sessionStorage.getItem("userId");
     if (!userId) return;
@@ -151,6 +162,66 @@ const Checkout: React.FC = () => {
     }
   };
 
+  const calculateTotal = () => {
+    const subtotal = cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+    const shippingCharges = subtotal > 499 ? 0 : 60;
+    let discountAmount = 0;
+
+    if (appliedCoupon) {
+      discountAmount = (subtotal * appliedCoupon.discountPercentage) / 100;
+    }
+
+    const total = subtotal - discountAmount + shippingCharges;
+
+    return {
+      subtotal,
+      shippingCharges,
+      discountAmount,
+      total: Math.max(0, total), // Ensure total is not negative
+    };
+  };
+
+  const handleCouponRedeem = async () => {
+    if (!couponCode) {
+      setCouponError("Please enter a coupon code.");
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, coupon: true }));
+    setCouponError(null);
+
+    try {
+      const response = await fetch("http://localhost:5000/coupon/verify-coupons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setCouponError(data.message || "Failed to verify coupon.");
+      } else if (data.message === "Coupons is valid and active") {
+        setAppliedCoupon({
+          name: data.coupons.name,
+          code: data.coupons.code,
+          discountPercentage: data.coupons.discountPercentage,
+        });
+        setCouponError(null);
+      } else {
+        setCouponError(data.message);
+      }
+    } catch (error) {
+      console.error("Error verifying coupon:", error);
+      setCouponError("An error occurred while verifying the coupon. Please try again.");
+    } finally {
+      setLoading((prev) => ({ ...prev, coupon: false }));
+    }
+  };
+
   const handleCheckout = async () => {
     if (saveAddress) {
       await handleSaveAddress();
@@ -165,24 +236,22 @@ const Checkout: React.FC = () => {
     setLoading((prev) => ({ ...prev, payment: true }));
 
     try {
-      const totalAmount = cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
+      const { total } = calculateTotal();
 
       const orderPayload = {
-        order_id: `order_${Date.now()}`, // Generate a unique order ID
-        amount: totalAmount,
+        order_id: `order_${Date.now()}`,
+        amount: total,
         currency: "INR",
         receipt: `order_rcptid_${Date.now()}`,
-        status: "created", // Default status
+        status: "created",
         userId: userId,
         orderedProducts: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
           price: item.price,
         })),
-        shippingAddress: address, // Include the address in the order payload
+        shippingAddress: address,
+        appliedCoupon: appliedCoupon,
       };
 
       const saveOrderResponse = await fetch(
@@ -252,6 +321,8 @@ const Checkout: React.FC = () => {
     );
   }
 
+  const { subtotal, shippingCharges, discountAmount, total } = calculateTotal();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
@@ -274,7 +345,56 @@ const Checkout: React.FC = () => {
             saveAddress={saveAddress}
             setSaveAddress={setSaveAddress}
           />
-          <OrderSummary cartItems={cartItems} />
+          <div>
+            <OrderSummary cartItems={cartItems} />
+            <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">Order Total</h3>
+              <div className="flex justify-between mb-2">
+                <span>Subtotal:</span>
+                <span>Rs.{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Shipping:</span>
+                <span>
+                  {shippingCharges === 0 ? (
+                    <span className="text-green-600">Free Shipping</span>
+                  ) : (
+                    `Rs.${shippingCharges.toFixed(2)}`
+                  )}
+                </span>
+              </div>
+              {appliedCoupon && (
+                <div className="flex justify-between mb-2 text-green-600">
+                  <span>Discount ({appliedCoupon.name}):</span>
+                  <span>-Rs.{discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
+                <span>Total:</span>
+                <span>Rs.{total.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">Apply Coupon</h3>
+              <div className="flex space-x-2">
+                <Input
+                  type="text"
+                  placeholder="Enter coupon code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                <Button onClick={handleCouponRedeem} disabled={loading.coupon}>
+                  {loading.coupon ? "Verifying..." : "Redeem"}
+                </Button>
+              </div>
+              {couponError && <p className="text-red-500 mt-2">{couponError}</p>}
+              {appliedCoupon && (
+                <p className="text-green-600 mt-2">
+                  Coupon "{appliedCoupon.name}" applied successfully!
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Checkout Button */}
@@ -296,3 +416,4 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
+
