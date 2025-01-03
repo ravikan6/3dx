@@ -24,7 +24,7 @@ export default function SignupPage() {
     try {
       // Note: You may need to update your signup function in AuthContext to include phone
       await signup(name, email, phone, password);
-      router.push("/"); // Redirect to dashboard after successful signup
+      router.push("/cart"); // Redirect to dashboard after successful signup
     } catch (err) {
       setError("Failed to create an account. Please try again.");
       console.log(err);

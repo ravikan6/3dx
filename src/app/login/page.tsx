@@ -21,7 +21,7 @@ export default function LoginPage() {
     setError("");
     try {
       await login(email, password);
-      router.push("/"); // Redirect to dashboard after successful login
+      router.push("/cart"); 
     } catch (err) {
       setError("Failed to login. Please check your credentials.");
       console.error(err);
