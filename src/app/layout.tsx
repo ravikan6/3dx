@@ -6,6 +6,7 @@ import { Footer } from "@/component/user/Footer/footer";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
+import { ReactNode } from "react"; // Import ReactNode
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -13,7 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const isAdminRoute = pathname.startsWith("/admin");
@@ -42,7 +43,7 @@ export default function RootLayout({ children }) {
           if (data.success) {
             const productsInCart = JSON.parse(data.cart.productsInCart);
             const uniqueProductIds = [
-              ...new Set(productsInCart.map((item) => item.productId)),
+              ...new Set(productsInCart.map((item:any) => item.productId)),
             ];
             setCartItemCount(uniqueProductIds.length);
           } else {
@@ -58,7 +59,7 @@ export default function RootLayout({ children }) {
     } else {
       setCartItemCount(0);
     }
-  }, [pathname]); // Fixed dependency array to be stable with 'pathname'
+  }, [pathname]);
 
   return (
     <html lang="en">
@@ -73,8 +74,7 @@ export default function RootLayout({ children }) {
               toggleMenu={toggleMenu}
             />
           )}
-          
-          {/* Render children directly if not admin route */}
+
           {isAdminRoute ? (
             <div>{children}</div>
           ) : (

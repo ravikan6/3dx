@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ShoppingCart, Users, MessageSquare, Mail, BarChart2, Link2, TrendingUp, User, Users2, Settings, MessageCircle } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, Mail, BarChart2, MessageCircle } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'

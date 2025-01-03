@@ -59,7 +59,12 @@ const Checkout: React.FC = () => {
     const userId = sessionStorage.getItem("userId");
     if (!userId) {
       setError("Please log in to proceed with checkout.");
-      setLoading({ address: false, cart: false, payment: false, coupon: false });
+      setLoading({
+        address: false,
+        cart: false,
+        payment: false,
+        coupon: false,
+      });
       return;
     }
 
@@ -194,11 +199,14 @@ const Checkout: React.FC = () => {
     setCouponError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/coupon/verify-coupons", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponCode }),
-      });
+      const response = await fetch(
+        "https://backend3dx.onrender.com/coupon/verify-coupons",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: couponCode }),
+        }
+      );
 
       const data = await response.json();
 
@@ -216,7 +224,9 @@ const Checkout: React.FC = () => {
       }
     } catch (error) {
       console.error("Error verifying coupon:", error);
-      setCouponError("An error occurred while verifying the coupon. Please try again.");
+      setCouponError(
+        "An error occurred while verifying the coupon. Please try again."
+      );
     } finally {
       setLoading((prev) => ({ ...prev, coupon: false }));
     }
@@ -266,7 +276,9 @@ const Checkout: React.FC = () => {
       const orderData = await saveOrderResponse.json();
 
       if (orderData.success) {
-        setPaymentResponse("Order saved successfully! Your order has been placed.");
+        setPaymentResponse(
+          "Order saved successfully! Your order has been placed."
+        );
       } else {
         setPaymentResponse("Failed to save order. Please try again.");
       }
@@ -387,7 +399,9 @@ const Checkout: React.FC = () => {
                   {loading.coupon ? "Verifying..." : "Redeem"}
                 </Button>
               </div>
-              {couponError && <p className="text-red-500 mt-2">{couponError}</p>}
+              {couponError && (
+                <p className="text-red-500 mt-2">{couponError}</p>
+              )}
               {appliedCoupon && (
                 <p className="text-green-600 mt-2">
                   Coupon "{appliedCoupon.name}" applied successfully!
@@ -416,4 +430,3 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
-

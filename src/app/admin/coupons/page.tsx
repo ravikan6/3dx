@@ -37,7 +37,9 @@ export default function CouponPage() {
 
   const fetchCoupons = async () => {
     try {
-      const response = await fetch("http://localhost:5000/coupon/get-coupons");
+      const response = await fetch(
+        "https://backend3dx.onrender.com/coupon/get-coupons"
+      );
       const data = await response.json();
       if (data.success && Array.isArray(data.couponss)) {
         setCoupons(data.couponss);
@@ -60,7 +62,7 @@ export default function CouponPage() {
     if (code && name && discountPercentage > 0) {
       try {
         const response = await fetch(
-          "http://localhost:5000/coupon/save-coupons",
+          "https://backend3dx.onrender.com/coupon/save-coupons",
           {
             method: "POST",
             headers: {
@@ -89,7 +91,7 @@ export default function CouponPage() {
   ) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/coupon/update-status",
+        "https://backend3dx.onrender.com/coupon/update-status",
         {
           method: "PUT",
           headers: {
@@ -111,7 +113,7 @@ export default function CouponPage() {
   const deleteCoupon = async (couponCode: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/coupon/delete-coupons",
+        "https://backend3dx.onrender.com/coupon/delete-coupons",
         {
           method: "DELETE",
           headers: {

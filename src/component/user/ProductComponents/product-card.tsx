@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "./image-carousel";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { Product } from "@/types/product";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,20 +46,22 @@ export function ProductCard({ product, view }: ProductCardProps) {
     }
   };
 
-  const cardClassName = view === "grid"
-    ? "w-full h-[420px] flex flex-col" // Fixed height and flexible width in grid view
-    : "w-full min-h-[200px] flex flex-row"; // Flexible for list view
+  const cardClassName =
+    view === "grid"
+      ? "w-full h-[420px] flex flex-col" // Fixed height and flexible width in grid view
+      : "w-full min-h-[200px] flex flex-row"; // Flexible for list view
 
-  const imageContainerClassName = view === "grid"
-    ? "h-[280px] w-full flex-shrink-0" // Fixed image size for grid view
-    : "w-[200px] h-[200px] flex-shrink-0"; // Square image in list view
+  const imageContainerClassName =
+    view === "grid"
+      ? "h-[280px] w-full flex-shrink-0" // Fixed image size for grid view
+      : "w-[200px] h-[200px] flex-shrink-0"; // Square image in list view
 
   return (
     <>
       <div
         className={`group relative bg-card rounded-lg border shadow-sm overflow-hidden ${cardClassName}`}
       >
-        <Link 
+        <Link
           href={`/shop/${product.productId}`}
           className={`block ${imageContainerClassName}`}
         >
@@ -62,7 +70,11 @@ export function ProductCard({ product, view }: ProductCardProps) {
           </div>
         </Link>
 
-        <div className={`flex flex-col p-4 ${view === "grid" ? "flex-grow" : "flex-1 ml-4"}`}>
+        <div
+          className={`flex flex-col p-4 ${
+            view === "grid" ? "flex-grow" : "flex-1 ml-4"
+          }`}
+        >
           <div className="space-y-2">
             <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">
               {product.productName}
@@ -88,8 +100,8 @@ export function ProductCard({ product, view }: ProductCardProps) {
             <p className="text-sm text-muted-foreground">
               {product.inStock} in stock
             </p>
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               onClick={handleAddToCart}
               size={view === "grid" ? "default" : "sm"}
             >
@@ -108,13 +120,8 @@ export function ProductCard({ product, view }: ProductCardProps) {
             Please log in to add products to your cart.
           </p>
           <DialogFooter>
-            <Button onClick={() => router.push("/login")}>
-              I'll Login
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/shop")}
-            >
+            <Button onClick={() => router.push("/login")}>I'll Login</Button>
+            <Button variant="ghost" onClick={() => router.push("/shop")}>
               No, I'll Pass
             </Button>
           </DialogFooter>
@@ -125,10 +132,23 @@ export function ProductCard({ product, view }: ProductCardProps) {
 }
 
 // Parent container for product cards
-const ProductList = ({ products, view }: { products: Product[], view: "grid" | "list" }) => {
+const ProductList = ({
+  products,
+  view,
+}: {
+  products: Product[];
+  view: "grid" | "list";
+}) => {
+  console.log(ProductList);
   return (
-    <div className={`grid gap-4 ${view === "grid" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : ""}`}>
-      {products.map(product => (
+    <div
+      className={`grid gap-4 ${
+        view === "grid"
+          ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          : ""
+      }`}
+    >
+      {products.map((product) => (
         <ProductCard key={product.productId} product={product} view={view} />
       ))}
     </div>

@@ -53,6 +53,7 @@ export default function MyProfile() {
         })));
       } catch (err) {
         setError("Failed to fetch user data. Please try again.");
+        console.log(err)
       } finally {
         setLoading(false);
       }

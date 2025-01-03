@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ArrowUpDown, Download, Search, Filter } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { ArrowUpDown, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -13,10 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -138,7 +133,6 @@ export default function OrdersPage() {
               Manage and monitor your orders
             </p>
           </div>
-         
         </div>
 
         <div className="space-y-4">
@@ -232,7 +226,9 @@ export default function OrdersPage() {
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.id}</TableCell>
+                        <TableCell className="font-medium">
+                          {order.id}
+                        </TableCell>
                         <TableCell>{order.customer}</TableCell>
                         <TableCell>{order.product}</TableCell>
                         <TableCell>{order.date}</TableCell>
