@@ -52,7 +52,7 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-pink-100 border-b border-pink-200">
+          <thead className="bg-black-100 border-b border-black-200">
             <tr>
               {[
                 { key: 'complaintNumber', label: 'Complaint ID' },
@@ -67,11 +67,11 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
                 <th 
                   key={label} 
                   onClick={() => key && handleSort(key as keyof Complaint)}
-                  className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${key ? 'cursor-pointer hover:bg-pink-200 transition-colors' : ''}`}
+                  className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${key ? 'cursor-pointer hover:bg-black-200 transition-colors' : ''}`}
                 >
                   <div className="flex items-center">
                     {label}
-                    {key && <ArrowUpDown size={14} className="ml-2 text-pink-400" />}
+                    {key && <ArrowUpDown size={14} className="ml-2 text-black-400" />}
                   </div>
                 </th>
               ))}
@@ -81,7 +81,7 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
             {sortedComplaints.map((complaint) => (
               <tr 
                 key={complaint.complaintNumber} 
-                className="hover:bg-pink-50 transition-colors duration-200"
+                className="hover:bg-black-50 transition-colors duration-200"
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {complaint.complaintNumber}
@@ -112,7 +112,7 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="flex items-center px-3 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition-colors">
+                      <Button variant="outline" className="flex items-center px-3 py-2 bg-black-100 text-black-700 rounded-lg hover:bg-black-200 transition-colors">
                         Update Status <ChevronDown size={16} className="ml-2" />
                       </Button>
                     </DropdownMenuTrigger>
