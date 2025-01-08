@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ArrowUpDown, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Sidebar } from "@/components/sidebar"; // Import Sidebar component
+import { useRouter } from "next/navigation";
 
 interface Order {
   id: string;
@@ -69,6 +70,40 @@ export default function OrdersPage() {
     key: "date",
     direction: "descending",
   });
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const verifySeller = async () => {
+      try {
+        const sellerId = localStorage.getItem('sellerId') 
+        
+        if (!sellerId) {
+          router.push('/seller')
+          return
+        }
+
+        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sellerId })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || data.loggedIn !== 'loggedin') {
+          router.push('/seller')
+        }
+      } catch (error) {
+        console.error('Error verifying seller:', error)
+        router.push('/seller')
+      }
+    }
+
+    verifySeller()
+  }, [router])
 
   const handleSort = (key: keyof Order) => {
     setSortConfig((current) => ({

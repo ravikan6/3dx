@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 interface Product {
   productId: string;
@@ -82,6 +83,40 @@ export default function ProductPage() {
     description: "",
     img: [],
   });
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const verifySeller = async () => {
+      try {
+        const sellerId = localStorage.getItem('sellerId') 
+        
+        if (!sellerId) {
+          router.push('/seller')
+          return
+        }
+
+        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sellerId })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || data.loggedIn !== 'loggedin') {
+          router.push('/seller')
+        }
+      } catch (error) {
+        console.error('Error verifying seller:', error)
+        router.push('/seller')
+      }
+    }
+
+    verifySeller()
+  }, [router])
 
   useEffect(() => {
     fetchProducts();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,6 +17,7 @@ import {
   
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   productId: z.string().length(6),
@@ -38,6 +39,40 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function AddProductPage() {
   const [images, setImages] = useState<string[]>([]);
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const verifySeller = async () => {
+      try {
+        const sellerId = localStorage.getItem('sellerId') 
+        
+        if (!sellerId) {
+          router.push('/seller')
+          return
+        }
+
+        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sellerId })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || data.loggedIn !== 'loggedin') {
+          router.push('/seller')
+        }
+      } catch (error) {
+        console.error('Error verifying seller:', error)
+        router.push('/seller')
+      }
+    }
+
+    verifySeller()
+  }, [router])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
