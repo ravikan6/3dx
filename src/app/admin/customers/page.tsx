@@ -20,11 +20,46 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
 import { Sidebar } from '@/components/sidebar'
 import { User, UsersResponse } from '@/types/customer'
+import { useRouter } from 'next/navigation'
 
 export default function CustomersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [sortField, setSortField] = useState<keyof User>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const verifySeller = async () => {
+      try {
+        const sellerId = localStorage.getItem('sellerId') 
+        
+        if (!sellerId) {
+          router.push('/seller')
+          return
+        }
+
+        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sellerId })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || data.loggedIn !== 'loggedin') {
+          router.push('/seller')
+        }
+      } catch (error) {
+        console.error('Error verifying seller:', error)
+        router.push('/seller')
+      }
+    }
+
+    verifySeller()
+  }, [router])
 
   useEffect(() => {
     fetchUsers()

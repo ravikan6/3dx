@@ -6,10 +6,45 @@ import { ComplaintsTable } from "@/component/admin/Table/complaints-table";
 import { Input } from "@/components/ui/input";
 import { Complaint } from "@/types/complaints";
 import {Sidebar} from "@/components/sidebar"; // Import the Sidebar component
+import { useRouter } from "next/navigation";
 
 export default function ComplaintsPage() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const verifySeller = async () => {
+      try {
+        const sellerId = localStorage.getItem('sellerId') 
+        
+        if (!sellerId) {
+          router.push('/seller')
+          return
+        }
+
+        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sellerId })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || data.loggedIn !== 'loggedin') {
+          router.push('/seller')
+        }
+      } catch (error) {
+        console.error('Error verifying seller:', error)
+        router.push('/seller')
+      }
+    }
+
+    verifySeller()
+  }, [router])
 
   useEffect(() => {
     fetchComplaints();
