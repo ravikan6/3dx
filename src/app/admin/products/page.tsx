@@ -280,7 +280,7 @@ export default function ProductPage() {
   const sortedProducts = React.useMemo(() => {
     if (!Array.isArray(products)) return [];
 
-    let sortableProducts = [...products];
+    const sortableProducts = [...products];
     if (sortConfig.key !== null) {
       sortableProducts.sort((a, b) => {
         // if (a[sortConfig.key!] < b[sortConfig.key!]) {
