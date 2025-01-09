@@ -53,6 +53,7 @@ interface EditValues {
   description?: string;
   img: string[];
 }
+//hosting fix
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -84,39 +85,42 @@ export default function ProductPage() {
     img: [],
   });
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const verifySeller = async () => {
       try {
-        const sellerId = localStorage.getItem('sellerId') 
-        
+        const sellerId = localStorage.getItem("sellerId");
+
         if (!sellerId) {
-          router.push('/seller')
-          return
+          router.push("/seller");
+          return;
         }
 
-        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ sellerId })
-        })
+        const response = await fetch(
+          "https://backend3dx.onrender.com/admin/verify-seller",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sellerId }),
+          }
+        );
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!response.ok || data.loggedIn !== 'loggedin') {
-          router.push('/seller')
+        if (!response.ok || data.loggedIn !== "loggedin") {
+          router.push("/seller");
         }
       } catch (error) {
-        console.error('Error verifying seller:', error)
-        router.push('/seller')
+        console.error("Error verifying seller:", error);
+        router.push("/seller");
       }
-    }
+    };
 
-    verifySeller()
-  }, [router])
+    verifySeller();
+  }, [router]);
 
   useEffect(() => {
     fetchProducts();
@@ -178,7 +182,9 @@ export default function ProductPage() {
         }));
         setUploadStatus("Upload successful");
         setSelectedFile(null);
-        const fileInput = document.getElementById("imageInput") as HTMLInputElement;
+        const fileInput = document.getElementById(
+          "imageInput"
+        ) as HTMLInputElement;
         if (fileInput) fileInput.value = "";
       } else {
         setUploadStatus("Upload failed: " + data.message);
@@ -291,7 +297,10 @@ export default function ProductPage() {
 
   const filteredProducts = sortedProducts.filter(
     (product) =>
-      product.productId?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.productId
+        ?.toString()
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       product.productName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -448,7 +457,10 @@ export default function ProductPage() {
                   <Input
                     value={editValues.productName}
                     onChange={(e) =>
-                      setEditValues({ ...editValues, productName: e.target.value })
+                      setEditValues({
+                        ...editValues,
+                        productName: e.target.value,
+                      })
                     }
                     disabled={!editingId}
                   />
@@ -460,7 +472,9 @@ export default function ProductPage() {
                     onChange={(e) =>
                       setEditValues({
                         ...editValues,
-                        categories: e.target.value.split(",").map((c) => c.trim()),
+                        categories: e.target.value
+                          .split(",")
+                          .map((c) => c.trim()),
                       })
                     }
                     disabled={!editingId}
@@ -493,134 +507,139 @@ export default function ProductPage() {
                         inStock: Number(e.target.value),
                       })
                     }
-                    disabled={!editingId}/>
-                    </div>
-                    <div>
-                      <Label>Sold</Label>
-                      <Input
-                        type="number"
-                        value={editValues.soldStockValue}
-                        onChange={(e) =>
-                          setEditValues({
-                            ...editValues,
-                            soldStockValue: Number(e.target.value),
-                          })
-                        }
-                        disabled={!editingId}
-                      />
-                    </div>
-                    <div>
-                      <Label>Description</Label>
-                      <Textarea
-                        value={editValues.description}
-                        onChange={(e) =>
-                          setEditValues({
-                            ...editValues,
-                            description: e.target.value,
-                          })
-                        }
-                        disabled={!editingId}
-                        className="h-32"
-                      />
-                    </div>
-                  </div>
+                    disabled={!editingId}
+                  />
                 </div>
-    
-                {/* Action Buttons */}
-                <div className="mt-6 flex justify-end space-x-4">
-                  {editingId ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setEditingId(null);
-                          if (selectedProduct) {
-                            setEditValues({
-                              productName: selectedProduct.productName,
-                              categories: selectedProduct.categories,
-                              productPrice: selectedProduct.productPrice,
-                              inStock: selectedProduct.inStock,
-                              soldStockValue: selectedProduct.soldStockValue,
-                              visibility: selectedProduct.visibility,
-                              description: selectedProduct.description || "",
-                              img: selectedProduct.img,
-                            });
-                          }
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button onClick={() => handleSave(selectedProduct?.productId!)}>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Changes
-                      </Button>
-                    </>
-                  ) : (
-                    <Button onClick={() => setEditingId(selectedProduct?.productId!)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit Product
+                <div>
+                  <Label>Sold</Label>
+                  <Input
+                    type="number"
+                    value={editValues.soldStockValue}
+                    onChange={(e) =>
+                      setEditValues({
+                        ...editValues,
+                        soldStockValue: Number(e.target.value),
+                      })
+                    }
+                    disabled={!editingId}
+                  />
+                </div>
+                <div>
+                  <Label>Description</Label>
+                  <Textarea
+                    value={editValues.description}
+                    onChange={(e) =>
+                      setEditValues({
+                        ...editValues,
+                        description: e.target.value,
+                      })
+                    }
+                    disabled={!editingId}
+                    className="h-32"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex justify-end space-x-4">
+              {editingId ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setEditingId(null);
+                      if (selectedProduct) {
+                        setEditValues({
+                          productName: selectedProduct.productName,
+                          categories: selectedProduct.categories,
+                          productPrice: selectedProduct.productPrice,
+                          inStock: selectedProduct.inStock,
+                          soldStockValue: selectedProduct.soldStockValue,
+                          visibility: selectedProduct.visibility,
+                          description: selectedProduct.description || "",
+                          img: selectedProduct.img,
+                        });
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => handleSave(selectedProduct?.productId!)}
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setEditingId(selectedProduct?.productId!)}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit Product
+                </Button>
+              )}
+            </div>
+
+            {/* Image Upload Section */}
+            {editingId && (
+              <div className="mt-6 border-t pt-6">
+                <h3 className="text-lg font-medium mb-4">Upload New Images</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <label className="flex-1 cursor-pointer group">
+                      <div className="flex items-center justify-center h-36 px-4 transition-all border-2 border-dashed rounded-xl border-gray-300 hover:border-black-400 hover:bg-black-50/50">
+                        <div className="flex flex-col items-center space-y-2 text-center">
+                          <ImageIcon className="w-8 h-8 text-gray-400 group-hover:text-black-500" />
+                          <span className="text-sm text-gray-500 group-hover:text-black-600">
+                            {selectedFile
+                              ? selectedFile.name
+                              : "Drop image here or click to browse"}
+                          </span>
+                        </div>
+                        <input
+                          type="file"
+                          id="imageInput"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                      </div>
+                    </label>
+                    <Button
+                      onClick={handleImageUpload}
+                      disabled={!selectedFile || isUploading}
+                      className="gap-2"
+                    >
+                      {isUploading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                      <span>{isUploading ? "Uploading..." : "Upload"}</span>
                     </Button>
+                  </div>
+
+                  {uploadStatus && (
+                    <p
+                      className={`text-sm font-medium ${
+                        uploadStatus.includes("failed") ||
+                        uploadStatus.includes("Error")
+                          ? "text-red-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {uploadStatus}
+                    </p>
                   )}
                 </div>
-    
-                {/* Image Upload Section */}
-                {editingId && (
-                  <div className="mt-6 border-t pt-6">
-                    <h3 className="text-lg font-medium mb-4">Upload New Images</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <label className="flex-1 cursor-pointer group">
-                          <div className="flex items-center justify-center h-36 px-4 transition-all border-2 border-dashed rounded-xl border-gray-300 hover:border-black-400 hover:bg-black-50/50">
-                            <div className="flex flex-col items-center space-y-2 text-center">
-                              <ImageIcon className="w-8 h-8 text-gray-400 group-hover:text-black-500" />
-                              <span className="text-sm text-gray-500 group-hover:text-black-600">
-                                {selectedFile
-                                  ? selectedFile.name
-                                  : "Drop image here or click to browse"}
-                              </span>
-                            </div>
-                            <input
-                              type="file"
-                              id="imageInput"
-                              accept="image/*"
-                              onChange={handleImageSelect}
-                              className="hidden"
-                              disabled={isUploading}
-                            />
-                          </div>
-                        </label>
-                        <Button
-                          onClick={handleImageUpload}
-                          disabled={!selectedFile || isUploading}
-                          className="gap-2"
-                        >
-                          {isUploading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Upload className="w-4 h-4" />
-                          )}
-                          <span>{isUploading ? "Uploading..." : "Upload"}</span>
-                        </Button>
-                      </div>
-    
-                      {uploadStatus && (
-                        <p
-                          className={`text-sm font-medium ${
-                            uploadStatus.includes("failed") ||
-                            uploadStatus.includes("Error")
-                              ? "text-red-600"
-                              : "text-green-600"
-                          }`}
-                        >
-                          {uploadStatus}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      );
-    }
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}
