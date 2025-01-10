@@ -139,7 +139,7 @@ export default function ProductDetail() {
           </div>
 
           <div className="text-3xl font-bold">
-            ${product.productPrice.toFixed(2)}
+            ₹{product.productPrice.toFixed(2)}
           </div>
 
           <div className="space-y-2">

@@ -180,7 +180,7 @@ export default function MyOrders(): JSX.Element {
 
                   <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
                     <div className="text-sm font-medium text-gray-900">
-                      Total: ${order.amount.toFixed(2)}
+                      Total: ₹{order.amount.toFixed(2)}
                     </div>
                     <button
                       onClick={() => handleViewDetails(order.order_id)}
@@ -245,7 +245,7 @@ export default function MyOrders(): JSX.Element {
             )}
             
             <p className="mt-4 text-lg font-bold text-gray-900">
-              Total: ${selectedOrder.amount.toFixed(2)}
+              Total: ₹{selectedOrder.amount.toFixed(2)}
             </p>
           </div>
         )}
