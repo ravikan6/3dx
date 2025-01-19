@@ -81,7 +81,7 @@ export function Navbar({ cartItemCount = 0, isMenuOpen, toggleMenu }: NavbarProp
             aria-label="Homepage"
           >
             <Box className="text-white/90" />
-            <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">3D.xyz</span>
+            <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">PreetyLittleShop</span>
           </Link>
 
           <nav className="hidden md:flex space-x-8">
