@@ -6,8 +6,9 @@ import { Footer } from "@/component/user/Footer/footer";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/AuthContext";
-import { ReactNode } from "react"; // Import ReactNode
+import { ReactNode } from "react"; // Import ReactNode for type checking
 
+// Fonts from Google
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Toggle Menu state (for mobile or dynamic menu)
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           if (data.success) {
             const productsInCart = JSON.parse(data.cart.productsInCart);
             const uniqueProductIds = [
-              ...new Set(productsInCart.map((item:any) => item.productId)),
+              ...new Set(productsInCart.map((item: any) => item.productId)),
             ];
             setCartItemCount(uniqueProductIds.length);
           } else {
@@ -59,14 +61,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     } else {
       setCartItemCount(0);
     }
-  }, [pathname]);
+  }, [pathname]); // Dependency on pathname to refresh cart when path changes
 
   return (
     <html lang="en">
       <AuthProvider>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`} // Apply custom fonts globally
         >
+          {/* Conditionally render Navbar for non-admin routes */}
           {!isAdminRoute && (
             <Navbar
               cartItemCount={cartItemCount}
@@ -75,12 +78,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             />
           )}
 
+          {/* Conditionally render content based on route */}
           {isAdminRoute ? (
             <div>{children}</div>
           ) : (
             children
           )}
 
+          {/* Conditionally render Footer for non-admin routes */}
           {!isAdminRoute && <Footer />}
         </body>
       </AuthProvider>

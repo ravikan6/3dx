@@ -23,89 +23,91 @@ import { Badge } from "@/components/ui/badge";
 import { Sidebar } from "@/components/sidebar"; // Import Sidebar component
 import { useRouter } from "next/navigation";
 
-interface Order {
+interface Gift {
   id: string;
-  customer: string;
-  product: string;
+  recipient: string;
+  giftItem: string;
   date: string;
-  total: number;
-  status: "pending" | "processing" | "completed" | "cancelled";
+  value: number;
+  status: "pending" | "dispatched" | "delivered" | "cancelled";
 }
 
-const orders: Order[] = [
+const gifts: Gift[] = [
   {
-    id: "ORD001",
-    customer: "John Doe",
-    product: "T-Shirt, Max",
+    id: "GFT001",
+    recipient: "Alice Johnson",
+    giftItem: "Gift Hamper",
     date: "2024-01-02",
-    total: 2889,
-    status: "completed",
+    value: 1500,
+    status: "delivered",
   },
   {
-    id: "ORD002",
-    customer: "Jane Smith",
-    product: "Bird Shorts",
-    date: "2024-01-02",
-    total: 1890,
+    id: "GFT002",
+    recipient: "Bob Smith",
+    giftItem: "Flower Bouquet",
+    date: "2024-01-01",
+    value: 500,
     status: "pending",
   },
   {
-    id: "ORD003",
-    customer: "Bob Johnson",
-    product: "T-Shirt, Max",
+    id: "GFT003",
+    recipient: "Charlie Brown",
+    giftItem: "Personalized Mug",
     date: "2024-01-01",
-    total: 2889,
-    status: "processing",
+    value: 700,
+    status: "dispatched",
   },
-  // Add more sample orders as needed
 ];
 
-export default function OrdersPage() {
+export default function GiftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Order | null;
+    key: keyof Gift | null;
     direction: "ascending" | "descending";
   }>({
     key: "date",
     direction: "descending",
   });
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const verifySeller = async () => {
       try {
-        const sellerId = localStorage.getItem('sellerId') 
-        
+        const sellerId = localStorage.getItem("sellerId");
+
         if (!sellerId) {
-          router.push('/seller')
-          return
+          router.push("/seller");
+          return;
         }
 
-        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ sellerId })
-        })
+        const response = await fetch(
+          "https://backend3dx.onrender.com/admin/verify-seller",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sellerId }),
+          }
+        );
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!response.ok || data.loggedIn !== 'loggedin') {
-          router.push('/seller')
+        if (!response.ok || data.loggedIn !== "loggedin") {
+          router.push("/seller");
         }
       } catch (error) {
-        console.error('Error verifying seller:', error)
-        router.push('/seller')
+        console.error("Error verifying seller:", error);
+        router.push("/seller");
       }
-    }
+    };
 
-    verifySeller()
-  }, [router])
+    verifySeller();
+  }, [router]);
 
-  const handleSort = (key: keyof Order) => {
+  const handleSort = (key: keyof Gift) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -115,16 +117,16 @@ export default function OrdersPage() {
     }));
   };
 
-  const filteredOrders = useMemo(() => {
-    return orders
-      .filter((order) => {
+  const filteredGifts = useMemo(() => {
+    return gifts
+      .filter((gift) => {
         const matchesSearch =
-          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.product.toLowerCase().includes(searchQuery.toLowerCase());
+          gift.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          gift.recipient.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          gift.giftItem.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesStatus =
-          statusFilter === "all" || order.status === statusFilter;
+          statusFilter === "all" || gift.status === statusFilter;
 
         return matchesSearch && matchesStatus;
       })
@@ -140,13 +142,13 @@ export default function OrdersPage() {
           return sortConfig.direction === "ascending" ? 1 : -1;
         return 0;
       });
-  }, [orders, searchQuery, statusFilter, sortConfig]);
+  }, [gifts, searchQuery, statusFilter, sortConfig]);
 
-  const getStatusColor = (status: Order["status"]) => {
+  const getStatusColor = (status: Gift["status"]) => {
     switch (status) {
-      case "completed":
+      case "delivered":
         return "bg-green-500/10 text-green-500";
-      case "processing":
+      case "dispatched":
         return "bg-blue-500/10 text-blue-500";
       case "pending":
         return "bg-yellow-500/10 text-yellow-500";
@@ -159,13 +161,13 @@ export default function OrdersPage() {
 
   return (
     <div className="flex">
-      <Sidebar className="w-64" /> {/* Add Sidebar component */}
+      <Sidebar className="w-64" />
       <div className="flex-1 space-y-8 p-8 pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Gifts</h2>
             <p className="text-muted-foreground">
-              Manage and monitor your orders
+              Manage and track the gifts sent to recipients
             </p>
           </div>
         </div>
@@ -175,7 +177,7 @@ export default function OrdersPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search orders..."
+                placeholder="Search gifts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -189,8 +191,8 @@ export default function OrdersPage() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="dispatched">Dispatched</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
@@ -206,25 +208,25 @@ export default function OrdersPage() {
                       onClick={() => handleSort("id")}
                     >
                       <div className="flex items-center gap-1">
-                        Order ID
+                        Gift ID
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
-                      onClick={() => handleSort("customer")}
+                      onClick={() => handleSort("recipient")}
                     >
                       <div className="flex items-center gap-1">
-                        Customer
+                        Recipient
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
-                      onClick={() => handleSort("product")}
+                      onClick={() => handleSort("giftItem")}
                     >
                       <div className="flex items-center gap-1">
-                        Product
+                        Gift Item
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
@@ -239,10 +241,10 @@ export default function OrdersPage() {
                     </TableHead>
                     <TableHead
                       className="cursor-pointer text-right"
-                      onClick={() => handleSort("total")}
+                      onClick={() => handleSort("value")}
                     >
                       <div className="flex items-center justify-end gap-1">
-                        Total
+                        Value
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
@@ -258,25 +260,25 @@ export default function OrdersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => (
-                      <TableRow key={order.id}>
+                  {filteredGifts.length > 0 ? (
+                    filteredGifts.map((gift) => (
+                      <TableRow key={gift.id}>
                         <TableCell className="font-medium">
-                          {order.id}
+                          {gift.id}
                         </TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell>{order.product}</TableCell>
-                        <TableCell>{order.date}</TableCell>
+                        <TableCell>{gift.recipient}</TableCell>
+                        <TableCell>{gift.giftItem}</TableCell>
+                        <TableCell>{gift.date}</TableCell>
                         <TableCell className="text-right">
-                          ₹{order.total.toLocaleString()}
+                          ₹{gift.value.toLocaleString()}
                         </TableCell>
                         <TableCell>
                           <Badge
                             variant="secondary"
-                            className={getStatusColor(order.status)}
+                            className={getStatusColor(gift.status)}
                           >
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
+                            {gift.status.charAt(0).toUpperCase() +
+                              gift.status.slice(1)}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -287,7 +289,7 @@ export default function OrdersPage() {
                         colSpan={6}
                         className="h-24 text-center text-muted-foreground"
                       >
-                        No orders found.
+                        No gifts found.
                       </TableCell>
                     </TableRow>
                   )}
@@ -300,5 +302,3 @@ export default function OrdersPage() {
     </div>
   );
 }
-
-// [#file:sidebar.tsx](#file:sidebar.tsx-context) as fixed

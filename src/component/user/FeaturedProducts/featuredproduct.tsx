@@ -98,14 +98,6 @@ export function FeaturedProducts() {
             </Link>
           ))}
         </motion.div>
-
-        <motion.div
-          className="text-center mt-16"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {/* Placeholder for any additional content */}
-        </motion.div>
       </div>
     </section>
   );

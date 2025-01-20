@@ -1,20 +1,20 @@
-"use client"
+'use client';
 
-import { useEffect } from "react"
-import { motion } from "framer-motion"
-import Image from "next/image"
-import Link from "next/link"
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   useEffect(() => {
     // Add a class to the body to hide the footer
-    document.body.classList.add("hide-footer")
+    document.body.classList.add("hide-footer");
 
     // Clean up by removing the class when the component is unmounted
     return () => {
-      document.body.classList.remove("hide-footer")
-    }
-  }, [])
+      document.body.classList.remove("hide-footer");
+    };
+  }, []);
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-zinc-900">
@@ -42,7 +42,7 @@ export default function Hero() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="text-center"
         >
-          <motion.div 
+          <motion.div
             className="w-full max-w-3xl mx-auto mb-6" // Adjusted max width
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export default function Hero() {
               priority
             />
           </motion.div>
-          
+
           <motion.div
             className="w-full max-w-md mx-auto mb-16" // Increased bottom margin
             initial={{ opacity: 0 }}
@@ -91,5 +91,5 @@ export default function Hero() {
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent pointer-events-none"></div>
     </div>
-  )
+  );
 }

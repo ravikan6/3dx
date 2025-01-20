@@ -4,7 +4,7 @@ export const featuredProducts = [
     title: "Dummy Product 1",
     price: 129.99,
     image:
-      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80", // Placeholder Image
     description: "A versatile and stylish product made from PLA and LED components, perfect for modern homes.",
     materials: ["PLA", "LED Components"],
     customizable: true,
@@ -19,7 +19,7 @@ export const featuredProducts = [
     title: "Dummy Product 2",
     price: 89.99,
     image:
-      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80", // Placeholder Image
     description: "An elegant product crafted from PETG, offering both durability and aesthetic appeal.",
     materials: ["PETG"],
     customizable: true,
@@ -34,7 +34,7 @@ export const featuredProducts = [
     title: "Dummy Product 3",
     price: 59.99,
     image:
-      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80", // Placeholder Image
     description: "A compact and affordable product made from PLA, ideal for small spaces.",
     materials: ["PLA"],
     customizable: false,
@@ -49,7 +49,7 @@ export const featuredProducts = [
     title: "Dummy Product 4",
     price: 199.99,
     image:
-      "https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&q=80", // Placeholder Image
     description: "A premium product combining ABS and metal, designed for high-end applications.",
     materials: ["ABS", "Metal"],
     customizable: false,
@@ -64,7 +64,7 @@ export const featuredProducts = [
     title: "Dummy Product 5",
     price: 79.99,
     image:
-      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80", // Placeholder Image
     description: "A unique product made from wood and metal, offering a blend of natural and industrial elements.",
     materials: ["Wood", "Metal"],
     customizable: true,
@@ -79,7 +79,7 @@ export const featuredProducts = [
     title: "Dummy Product 6",
     price: 299.99,
     image:
-      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80", // Placeholder Image
     description: "A luxurious product crafted from glass and wood, perfect for sophisticated interiors.",
     materials: ["Glass", "Wood"],
     customizable: false,

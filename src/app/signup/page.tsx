@@ -1,142 +1,96 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { GiftCard } from "@/components/user/GiftComponents/gift-card"; // Adjusted for gifts
+import { CategoryFilter } from "@/components/user/GiftComponents/category-filter"; // Adjusted for gifts
+import { ViewToggle } from "@/components/user/GiftComponents/view-toggle"; // Adjusted for gifts
+import { SortGifts } from "@/components/user/GiftComponents/sort-gifts"; // Adjusted for gifts
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { User, Mail, Phone, Lock } from "lucide-react";
 
-export default function SignupPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+export default function GiftPage() {
+  const [gifts, setGifts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { signup } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [sortOrder, setSortOrder] = useState('price-asc');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    try {
-      // Note: You may need to update your signup function in AuthContext to include phone
-      await signup(name, email, phone, password);
-      router.push("/cart"); // Redirect to dashboard after successful signup
-    } catch (err) {
-      setError("Failed to create an account. Please try again.");
-      console.log(err);
+  useEffect(() => {
+    async function loadGifts() {
+      try {
+        const response = await fetch("https://your-api-url.com/gifts");
+        const data = await response.json();
+        setGifts(data.gifts);
+      } catch (err) {
+        setError("Failed to load gifts");
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+
+    loadGifts();
+  }, []);
+
+  // Get unique categories from all gifts
+  const allCategories = Array.from(
+    new Set(gifts.flatMap(gift => gift.categories))
+  );
+
+  // Filter gifts by selected category
+  const filteredGifts = selectedCategory
+    ? gifts.filter(gift => gift.categories.includes(selectedCategory))
+    : gifts;
+
+  // Sort gifts
+  const sortedGifts = [...filteredGifts].sort((a, b) => {
+    if (sortOrder === 'price-asc') {
+      return a.price - b.price;
+    } else {
+      return b.price - a.price;
+    }
+  });
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div className="min-h-screen mt-12 flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
       <div className="w-full max-w-md">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-lg px-12 pt-8 pb-8 mb-4 transform transition-all hover:scale-105 shadow-3d"
-        >
-          <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-            Sign Up
-          </h2>
-          <div className="mb-4">
-            <Label
-              htmlFor="name"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Name
-            </Label>
-            <div className="flex items-center space-x-2">
-              <User className="h-4 w-4 text-gray-700" />
-              <Input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Enter your name"
-                required
-              />
-            </div>
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Gifts For You!
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start mb-8">
+          <CategoryFilter
+            categories={allCategories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+          <div className="flex gap-4">
+            <SortGifts onSortChange={setSortOrder} />
+            <ViewToggle view={view} onViewChange={setView} />
           </div>
-          <div className="mb-4">
-            <Label
-              htmlFor="email"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Email
-            </Label>
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4 text-gray-700" />
-              <Input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <Label
-              htmlFor="phone"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Phone Number
-            </Label>
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4 text-gray-700" />
-              <Input
-                type="tel"
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Enter your phone number"
-                required
-              />
-            </div>
-          </div>
-          <div className="mb-6">
-            <Label
-              htmlFor="password"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Password
-            </Label>
-            <div className="flex items-center space-x-2">
-              <Lock className="h-4 w-4 text-gray-700" />
-              <Input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-          </div>
-          {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
-          <div className="flex items-center justify-between">
-            <Button
-              type="submit"
-              className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              Sign Up
-            </Button>
-            <Link
-              href="/login"
-              className="inline-block align-baseline font-bold text-sm text-gray-800 hover:text-gray-700"
-            >
-              Already have an account?
-            </Link>
-          </div>
-        </form>
+        </div>
+
+        <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center' : 'flex flex-col gap-6'}>
+          {sortedGifts.map((gift) => (
+            <GiftCard
+              key={gift.id}
+              gift={gift}
+              view={view}
+            />
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Button
+            onClick={() => router.push("/cart")}
+            className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Go to Cart
+          </Button>
+        </div>
       </div>
     </div>
   );

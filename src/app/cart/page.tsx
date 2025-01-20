@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaTrash } from "react-icons/fa";
-import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { FaGift } from "react-icons/fa"; // Icon change for gift
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import type { Product } from "@/types/product";
 
-type CartItemProps = {
+type GiftItemProps = {
   id: string;
   name: string;
   price: number;
@@ -40,11 +40,10 @@ const SectionCard: React.FC<SectionCardProps> = ({
   </div>
 );
 
-const CartItem: React.FC<{
-  item: CartItemProps;
-  onDelete: (productId: string) => void;
-  onUpdateQuantity: (productId: string, newQuantity: number) => void;
-}> = ({ item, onDelete, onUpdateQuantity }) => (
+const GiftItem: React.FC<{
+  item: GiftItemProps;
+  onGift: (productId: string) => void; // On gift action
+}> = ({ item, onGift }) => (
   <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-100 p-4 rounded-2xl shadow-md hover:shadow-lg transition-all mb-4">
     <img
       src={item.image}
@@ -54,55 +53,36 @@ const CartItem: React.FC<{
     <div className="flex-1 text-center sm:text-left">
       <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
       <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
-      <div className="flex items-center justify-center sm:justify-start gap-4 mt-2">
-        <button
-          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all disabled:opacity-50"
-          onClick={
-            () =>
-              item.quantity > 1 && onUpdateQuantity(item.id, item.quantity - 1) // Decrement quantity
-          }
-          disabled={item.quantity <= 1}
-        >
-          <AiOutlineMinus />
-        </button>
-        <span className="text-gray-800">{item.quantity}</span>
-        <button
-          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all"
-          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} // Increment quantity
-        >
-          <AiOutlinePlus />
-        </button>
-      </div>
     </div>
     <button
-      className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all mt-4 sm:mt-0"
-      onClick={() => onDelete(item.id)} // Delete item
+      className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all mt-4 sm:mt-0"
+      onClick={() => onGift(item.id)} // Gift this item
     >
-      <FaTrash />
+      <FaGift />
     </button>
   </div>
 );
 
-const Cart: React.FC = () => {
+const Gift: React.FC = () => {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItemProps[]>([]);
+  const [giftItems, setGiftItems] = useState<GiftItemProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCartData = async () => {
+    const fetchGiftData = async () => {
       const userId = sessionStorage.getItem("userId");
 
       if (!userId) {
-        setError("Please log in to view the cart.");
+        setError("Please log in to view the gift items.");
         setLoading(false);
         return;
       }
 
       try {
-        // Fetch cart data
-        const cartResponse = await fetch(
-          "https://backend3dx.onrender.com/cart/get-cart",
+        // Fetch gift data
+        const giftResponse = await fetch(
+          "https://backend3dx.onrender.com/gift/get-gift-items",
           {
             method: "POST",
             headers: {
@@ -112,48 +92,41 @@ const Cart: React.FC = () => {
           }
         );
 
-        const cartData = await cartResponse.json();
+        const giftData = await giftResponse.json();
 
-        if (!cartData.success) {
-          setError("Failed to fetch cart data.");
+        if (!giftData.success) {
+          setError("Failed to fetch gift data.");
           setLoading(false);
           return;
         }
 
-        const productsInCart = JSON.parse(cartData.cart.productsInCart);
+        const productsInGift = JSON.parse(giftData.gift.productsInGift);
 
-        // Filter out duplicates based on productId
-        const uniqueProducts = productsInCart.filter(
-          (item: any, index: number, self: any[]) =>
-            index === self.findIndex((t) => t.productId === item.productId)
-        );
-
-        // Fetch product details for each unique product
+        // Fetch product details for each gift item
         const products = await Promise.all(
-          uniqueProducts.map(async (cartItem: any) => {
+          productsInGift.map(async (giftItem: any) => {
             try {
               const productResponse = await fetch(
-                `https://backend3dx.onrender.com/product/product/${cartItem.productId}`
+                `https://backend3dx.onrender.com/product/product/${giftItem.productId}`
               );
               const productData = await productResponse.json();
 
               if (!productData.success) {
-                console.warn(`Product not found for ID: ${cartItem.productId}`);
-                await handleDelete(cartItem.productId);
+                console.warn(`Product not found for ID: ${giftItem.productId}`);
                 return null;
               }
 
               const product: Product = productData.product;
               return {
-                id: cartItem.productId,
+                id: giftItem.productId,
                 name: product.productName,
                 price: product.productPrice,
-                quantity: cartItem.productQty,
+                quantity: giftItem.productQty,
                 image: product.img[0],
               };
             } catch (error) {
               console.error(
-                `Error fetching product ${cartItem.productId}:`,
+                `Error fetching product ${giftItem.productId}:`,
                 error
               );
               return null;
@@ -162,31 +135,31 @@ const Cart: React.FC = () => {
         );
 
         // Filter out null values (products that weren't found)
-        setCartItems(
+        setGiftItems(
           products.filter(
-            (product): product is CartItemProps => product !== null
+            (product): product is GiftItemProps => product !== null
           )
         );
       } catch (error) {
-        console.error("Error fetching cart data:", error);
+        console.error("Error fetching gift data:", error);
         setError(
-          "An error occurred while fetching cart data. Please try again."
+          "An error occurred while fetching gift data. Please try again."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCartData();
+    fetchGiftData();
   }, []);
 
-  const handleDelete = async (productId: string) => {
+  const handleGift = async (productId: string) => {
     const userId = sessionStorage.getItem("userId");
     if (!userId) return;
 
     try {
       const response = await fetch(
-        "https://backend3dx.onrender.com/cart/delete-item",
+        "https://backend3dx.onrender.com/gift/add-to-gift-list",
         {
           method: "POST",
           headers: {
@@ -198,62 +171,14 @@ const Cart: React.FC = () => {
 
       const data = await response.json();
       if (data.success) {
-        setCartItems((prevItems) =>
-          prevItems.filter((item) => item.id !== productId)
-        );
+        // Optionally, you can update the local state or give a success message.
       } else {
-        console.error("Failed to delete item:", data.message);
+        console.error("Failed to add item to gift list:", data.message);
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error("Error adding item to gift list:", error);
     }
   };
-
-  const handleUpdateQuantity = async (
-    productId: string,
-    newQuantity: number
-  ) => {
-    const userId = sessionStorage.getItem("userId");
-    if (!userId) return;
-
-    try {
-      const response = await fetch(
-        "https://backend3dx.onrender.com/cart/update-quantity",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId,
-            productId,
-            productQty: newQuantity,
-          }),
-        }
-      );
-
-      const data = await response.json();
-      if (data.success) {
-        // Update local state only after successful API response
-        setCartItems((prevItems) =>
-          prevItems.map((item) =>
-            item.id === productId ? { ...item, quantity: newQuantity } : item
-          )
-        );
-      } else {
-        console.error("Failed to update quantity:", data.message);
-        // Optionally show an error message to the user
-      }
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-      // Optionally show an error message to the user
-    }
-  };
-
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
 
   if (loading) {
     return (
@@ -286,30 +211,29 @@ const Cart: React.FC = () => {
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold mb-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-gray-600">
-              Your Cart
+              Your Gift List
             </span>
             <span className="text-gray-600 block text-3xl mt-2">
-              Review your selections and proceed to checkout
+              Choose the items you want to gift
             </span>
           </h1>
         </div>
 
-        {/* Cart Items and Summary Section */}
+        {/* Gift Items Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <SectionCard title="Cart Items" dataAos="fade-right">
-            {cartItems.length > 0 ? (
-              cartItems.map((item) => (
-                <CartItem
+          <SectionCard title="Gift Items" dataAos="fade-right">
+            {giftItems.length > 0 ? (
+              giftItems.map((item) => (
+                <GiftItem
                   key={item.id}
                   item={item}
-                  onDelete={handleDelete}
-                  onUpdateQuantity={handleUpdateQuantity}
+                  onGift={handleGift}
                 />
               ))
             ) : (
               <div className="text-center">
                 <p className="text-gray-600 mb-4">
-                  Oops! You didn't add anything to your basket.
+                  Oops! You didn't add anything to your gift list.
                 </p>
                 <button
                   onClick={() => router.push("/shop")}
@@ -320,31 +244,10 @@ const Cart: React.FC = () => {
               </div>
             )}
           </SectionCard>
-
-          {cartItems.length > 0 && (
-            <SectionCard title="Order Summary" dataAos="fade-left">
-              <div className="text-gray-600 leading-relaxed">
-                <p className="flex justify-between mb-4">
-                  <span>Subtotal:</span>{" "}
-                  <span>Rs.{totalAmount.toFixed(2)}</span>
-                </p>
-                <p className="flex justify-between font-bold text-lg text-gray-800">
-                  <span>Total:</span>{" "}
-                  <span>Rs.{(totalAmount + 0.0).toFixed(2)}</span>
-                </p>
-              </div>
-              <button
-                className="w-full mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl text-lg font-bold hover:bg-blue-600 transition-all"
-                onClick={() => router.push("/checkout")}
-              >
-                Proceed to Checkout
-              </button>
-            </SectionCard>
-          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default Cart;
+export default Gift;

@@ -2,98 +2,98 @@
 
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import { ComplaintsTable } from "@/component/admin/Table/complaints-table";
+import { GiftsTable } from "@/component/admin/Table/gifts-table"; // Updated to GiftsTable
 import { Input } from "@/components/ui/input";
-import { Complaint } from "@/types/complaints";
-import {Sidebar} from "@/components/sidebar"; // Import the Sidebar component
+import { Gift } from "@/types/gifts"; // Updated to Gift type
+import { Sidebar } from "@/components/sidebar"; // Import the Sidebar component
 import { useRouter } from "next/navigation";
 
-export default function ComplaintsPage() {
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
+export default function GiftsPage() { // Renamed component
+  const [gifts, setGifts] = useState<Gift[]>([]); // Updated to manage gifts
   const [searchQuery, setSearchQuery] = useState("");
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const verifySeller = async () => {
       try {
-        const sellerId = localStorage.getItem('sellerId') 
-        
+        const sellerId = localStorage.getItem("sellerId");
+
         if (!sellerId) {
-          router.push('/seller')
-          return
+          router.push("/seller");
+          return;
         }
 
-        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
-          method: 'POST',
+        const response = await fetch("https://backend3dx.onrender.com/admin/verify-seller", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ sellerId })
-        })
+          body: JSON.stringify({ sellerId }),
+        });
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!response.ok || data.loggedIn !== 'loggedin') {
-          router.push('/seller')
+        if (!response.ok || data.loggedIn !== "loggedin") {
+          router.push("/seller");
         }
       } catch (error) {
-        console.error('Error verifying seller:', error)
-        router.push('/seller')
+        console.error("Error verifying seller:", error);
+        router.push("/seller");
       }
-    }
+    };
 
-    verifySeller()
-  }, [router])
+    verifySeller();
+  }, [router]);
 
   useEffect(() => {
-    fetchComplaints();
+    fetchGifts();
   }, []);
 
-  const fetchComplaints = async () => {
+  const fetchGifts = async () => {
     try {
       const response = await fetch(
-        "https://backend3dx.onrender.com/complaints/get-complaints"
+        "https://backend3dx.onrender.com/gifts/get-gifts" // Updated endpoint
       );
       const data = await response.json();
-      setComplaints(data.complaints);
+      setGifts(data.gifts); // Updated state
     } catch (error) {
-      console.error("Error fetching complaints:", error);
+      console.error("Error fetching gifts:", error);
     }
   };
 
-  const handleStatusChange = async (complaintId: string, newStatus: string) => {
+  const handleStatusChange = async (giftId: string, newStatus: string) => {
     try {
       const response = await fetch(
-        "https://backend3dx.onrender.com/update-complaint-status",
+        "https://backend3dx.onrender.com/update-gift-status", // Updated endpoint
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            complaintId,
+            giftId, // Updated field
             status: newStatus,
           }),
         }
       );
 
       if (response.ok) {
-        fetchComplaints();
+        fetchGifts(); // Updated function call
       }
     } catch (error) {
-      console.error("Error updating complaint status:", error);
+      console.error("Error updating gift status:", error);
     }
   };
 
-  const filteredComplaints = complaints.filter((complaint) =>
-    complaint.complaintNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredGifts = gifts.filter((gift) =>
+    gift.giftNumber?.toLowerCase().includes(searchQuery.toLowerCase()) // Updated filtering logic
   );
 
   return (
     <div className="flex h-screen">
-        <div className="hidden w-64 border-r bg-white md:block">
-      <Sidebar />
+      <div className="hidden w-64 border-r bg-white md:block">
+        <Sidebar />
       </div>
       {/* Table Section */}
       <div className="flex-1 p-6 lg:p-8 overflow-auto">
@@ -106,7 +106,7 @@ export default function ComplaintsPage() {
               </div>
               <Input
                 type="text"
-                placeholder="Search by complaint ID..."
+                placeholder="Search by gift ID..." // Updated placeholder
                 className="w-full pl-10 pr-4 py-2.5 border border-black-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black-300 bg-white shadow-sm transition-all duration-300"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -114,10 +114,10 @@ export default function ComplaintsPage() {
             </div>
           </div>
 
-          {/* Complaints Table */}
-          <ComplaintsTable
-            complaints={filteredComplaints}
-            onStatusChange={handleStatusChange}
+          {/* Gifts Table */}
+          <GiftsTable // Updated component name
+            gifts={filteredGifts} // Updated prop
+            onStatusChange={handleStatusChange} // Updated function
           />
         </div>
       </div>

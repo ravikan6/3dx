@@ -48,13 +48,13 @@ export function ProductCard({ product, view }: ProductCardProps) {
 
   const cardClassName =
     view === "grid"
-      ? "w-full h-[420px] flex flex-col" // Fixed height and flexible width in grid view
-      : "w-full min-h-[200px] flex flex-row"; // Flexible for list view
+      ? "w-full h-[420px] flex flex-col"
+      : "w-full min-h-[200px] flex flex-row";
 
   const imageContainerClassName =
     view === "grid"
-      ? "h-[280px] w-full flex-shrink-0" // Fixed image size for grid view
-      : "w-[200px] h-[200px] flex-shrink-0"; // Square image in list view
+      ? "h-[280px] w-full flex-shrink-0"
+      : "w-[200px] h-[200px] flex-shrink-0";
 
   return (
     <>
@@ -71,9 +71,7 @@ export function ProductCard({ product, view }: ProductCardProps) {
         </Link>
 
         <div
-          className={`flex flex-col p-4 ${
-            view === "grid" ? "flex-grow" : "flex-1 ml-4"
-          }`}
+          className={`flex flex-col p-4 ${view === "grid" ? "flex-grow" : "flex-1 ml-4"}`}
         >
           <div className="space-y-2">
             <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">
@@ -139,7 +137,7 @@ const ProductList = ({
   products: Product[];
   view: "grid" | "list";
 }) => {
-  console.log(ProductList);
+  console.log("Rendering product list", products); // Log the products instead of the ProductList component
   return (
     <div
       className={`grid gap-4 ${

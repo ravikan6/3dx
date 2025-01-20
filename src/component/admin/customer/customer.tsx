@@ -78,6 +78,11 @@ const CustomersPage = () => {
   };
 
   const handleAddCustomer = async () => {
+    if (!newCustomer.userId || !newCustomer.name || !newCustomer.email) {
+      alert('Please fill all the fields.');
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/add-customer`, {
         method: 'POST',
@@ -131,7 +136,7 @@ const CustomersPage = () => {
             />
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border mb-6">
+            <div className="rounded-md border mb-6 p-4">
               <Input
                 placeholder="User ID"
                 value={newCustomer.userId}
@@ -157,7 +162,10 @@ const CustomersPage = () => {
                 <TableHeader>
                   <TableRow>
                     {['User ID', 'Name', 'Email', 'Account Status'].map((header, index) => (
-                      <TableHead key={index} onClick={() => handleSort(header.toLowerCase() as keyof Customer)}>
+                      <TableHead
+                        key={index}
+                        onClick={() => handleSort(header.toLowerCase() as keyof Customer)}
+                      >
                         <div className="flex items-center cursor-pointer">
                           {header}
                           <ArrowUpDown size={14} className="ml-1" />

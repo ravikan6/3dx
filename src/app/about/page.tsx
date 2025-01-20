@@ -30,24 +30,29 @@ const AboutPage: React.FC = () => {
         <div className="text-center mb-16">
           <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-800">
-              About Our Company
+              Welcome to Our World of 3D Innovation
             </span>
           </h1>
           <p className="text-lg sm:text-2xl text-gray-800 mt-2">
-            Explore products with every dimension
+            Transforming the way you experience products with immersive technology.
           </p>
         </div>
 
         {/* About Sections */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* About Our Company Section */}
-          <SectionCard title="About Our Company" dataAos="fade-right">
+          {/* Gift Section (Modified First Page) */}
+          <SectionCard title="The Perfect Gift for You" dataAos="fade-right">
             <p className="text-gray-700 mb-4 leading-relaxed">
-              At 3D XYZ, we are more than just a company. We are a community dedicated to creating meaningful connections and providing exceptional experiences.
+              Discover the joy of gifting like never before. With our cutting-edge 3D technology, you can visualize, personalize, and share gifts that create lasting memories.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Our journey is fueled by creativity, cutting-edge technology, and a commitment to delivering immersive 3D experiences that help our clients visualize and connect with products like never before.
+              Whether it's for a loved one or a corporate occasion, our platform ensures every gift is unique and meaningful. Start your journey with us today and experience the magic of giving.
             </p>
+            <div className="mt-4 text-center">
+              <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg hover:scale-105 transform transition-transform duration-300">
+                Explore Gift Options
+              </button>
+            </div>
           </SectionCard>
 
           {/* Why Choose Us Section */}

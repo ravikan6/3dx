@@ -7,40 +7,40 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Product } from "@/types/product";
 
-export default function ProductDetail() {
+export default function GiftPage() {
   const { productId } = useParams();
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [gift, setGift] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchGift = async () => {
       try {
         const response = await fetch(`https://backend3dx.onrender.com/product/product/${productId}`);
         const data = await response.json();
 
         if (data.success) {
-          setProduct(data.product);
-          // Update page title
-          document.title = data.product.productName;
+          setGift(data.product);
+          // Update page title to reflect gift item
+          document.title = `Gift: ${data.product.productName}`;
         } else {
-          setError("Product not found");
+          setError("Gift item not found");
         }
       } catch (err) {
-        setError("Failed to load product");
-        console.error("Error fetching product:", err);
+        setError("Failed to load gift item");
+        console.error("Error fetching gift item:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    fetchGift();
   }, [productId]);
 
-  const handleAddToBasket = async () => {
+  const handleAddToGiftBox = async () => {
     const userId = sessionStorage.getItem("userId");
 
     if (!userId) {
@@ -50,7 +50,7 @@ export default function ProductDetail() {
     }
 
     try {
-      // Make the API call to add the product to the cart
+      // Make the API call to add the gift to the user's gift box (or cart)
       await fetch("https://backend3dx.onrender.com/cart/addtocart", {
         method: "POST",
         headers: {
@@ -58,15 +58,15 @@ export default function ProductDetail() {
         },
         body: JSON.stringify({
           userId,
-          productId: product?.productId,
+          productId: gift?.productId,
           quantity: 1,
         }),
       });
 
-      alert("Product added to basket successfully!");
+      alert("Gift added to your gift box!");
     } catch (error) {
-      console.error("Error adding product to basket:", error);
-      alert("Failed to add product to basket. Please try again.");
+      console.error("Error adding gift to box:", error);
+      alert("Failed to add gift to your box. Please try again.");
     }
   };
 
@@ -78,10 +78,10 @@ export default function ProductDetail() {
     );
   }
 
-  if (error || !product) {
+  if (error || !gift) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">{error || "Product not found"}</p>
+        <p className="text-red-500">{error || "Gift item not found"}</p>
       </div>
     );
   }
@@ -93,14 +93,14 @@ export default function ProductDetail() {
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-lg">
             <img
-              src={product.img[selectedImage]}
-              alt={product.productName}
+              src={gift.img[selectedImage]}
+              alt={gift.productName}
               className="object-cover"
               loading="lazy"
             />
           </div>
           <div className="flex space-x-2 overflow-x-auto">
-            {product.img.map((image, index) => (
+            {gift.img.map((image, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
@@ -109,7 +109,7 @@ export default function ProductDetail() {
               >
                 <img
                   src={image}
-                  alt={`${product.productName} view ${index + 1}`}
+                  alt={`${gift.productName} view ${index + 1}`}
                   className="object-cover"
                 />
               </button>
@@ -117,11 +117,11 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Right column - Product details */}
+        {/* Right column - Gift details */}
         <div className="space-y-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">{product.productName}</h1>
-            <p className="text-gray-600">{product.categories.join(", ")}</p>
+            <h1 className="text-3xl font-bold">{gift.productName}</h1>
+            <p className="text-gray-600">{gift.categories.join(", ")}</p>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -129,9 +129,7 @@ export default function ProductDetail() {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-5 h-5 ${
-                    i < 4 ? "fill-primary text-primary" : "fill-muted text-muted-foreground"
-                  }`}
+                  className={`w-5 h-5 ${i < 4 ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
                 />
               ))}
             </div>
@@ -139,12 +137,12 @@ export default function ProductDetail() {
           </div>
 
           <div className="text-3xl font-bold">
-            ₹{product.productPrice.toFixed(2)}
+            ₹{gift.productPrice.toFixed(2)}
           </div>
 
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Stock: {product.inStock} units available
+              Stock: {gift.inStock} units available
             </p>
           </div>
 
@@ -152,14 +150,14 @@ export default function ProductDetail() {
             <Button className="flex-1" variant="outline">
               Buy Now
             </Button>
-            <Button className="flex-1" onClick={handleAddToBasket}>
-              Add to Basket
+            <Button className="flex-1" onClick={handleAddToGiftBox}>
+              Add to Gift Box
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Dialog Box */}
+      {/* Dialog Box for non-logged-in users */}
       {showDialog && (
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent>
@@ -167,7 +165,7 @@ export default function ProductDetail() {
               <DialogTitle>Oops! You are not logged in</DialogTitle>
             </DialogHeader>
             <p className="text-sm text-muted-foreground">
-              Please log in to add products to your basket.
+              Please log in to add gifts to your gift box.
             </p>
             <DialogFooter>
               <Button

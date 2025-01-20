@@ -1,64 +1,44 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package2, Truck, MapPin, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Package2, Gift, Filter, CheckCircle2 } from 'lucide-react';
+import { CategoryFilter } from '@/components/user/GiftComponents/category-filter'; // Adjust for gifts
+import { SortGifts } from '@/components/user/GiftComponents/sort-gifts'; // Adjust for gifts
 
-interface TrackingEvent {
-  status: string;
-  location: string;
-  date: string;
+interface Gift {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
 }
 
-interface TrackingData {
-  current_status: string;
-  awb_code: string;
-  courier_name: string;
-  destination: string;
-  pickup_date: string;
-  etd: string;
-  tracking_data: TrackingEvent[];
-}
-
-const getStatusColor = (status: string): string => {
-  const statusColors: { [key: string]: string } = {
-    'PENDING': 'text-yellow-500',
-    'PICKED UP': 'text-blue-500',
-    'IN_TRANSIT': 'text-blue-600',
-    'OUT_FOR_DELIVERY': 'text-purple-500',
-    'DELIVERED': 'text-green-500',
-    'CANCELLED': 'text-red-500',
-    'DELAYED': 'text-orange-500'
-  };
-  return statusColors[status] || 'text-gray-500';
-};
-
-const TrackOrder = () => {
+const GiftPage = () => {
   const router = useRouter();
-  const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [filteredGifts, setFilteredGifts] = useState<Gift[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<string>('price-asc');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTrackingData = async () => {
+    const fetchGifts = async () => {
       try {
-        const shipmentId = sessionStorage.getItem('currentOrderShipmentId');
-        if (!shipmentId) {
-          setError('No shipment ID found');
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(`/api/orders/track/${shipmentId}`);
+        const response = await fetch('/api/gifts'); // Replace with your API endpoint
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch tracking information');
+          throw new Error(data.error || 'Failed to fetch gifts');
         }
 
-        setTrackingData(data);
+        setGifts(data.gifts);
+        setCategories([...new Set(data.gifts.map((gift: Gift) => gift.category))]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -66,8 +46,24 @@ const TrackOrder = () => {
       }
     };
 
-    fetchTrackingData();
+    fetchGifts();
   }, []);
+
+  useEffect(() => {
+    let filtered = [...gifts];
+
+    if (selectedCategory) {
+      filtered = filtered.filter(gift => gift.category === selectedCategory);
+    }
+
+    if (sortOrder === 'price-asc') {
+      filtered = filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOrder === 'price-desc') {
+      filtered = filtered.sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredGifts(filtered);
+  }, [gifts, selectedCategory, sortOrder]);
 
   if (loading) {
     return (
@@ -82,11 +78,11 @@ const TrackOrder = () => {
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-lg">
           <CardContent className="text-center p-6">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <CheckCircle2 className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-red-500 mb-2">Error</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => router.push('/orders')}>
-              View All Orders
+            <Button onClick={() => router.push('/home')}>
+              Go to Home
             </Button>
           </CardContent>
         </Card>
@@ -99,71 +95,37 @@ const TrackOrder = () => {
       <div className="max-w-4xl mx-auto">
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="text-2xl">Order Tracking</span>
-              <span className={`text-lg font-medium ${getStatusColor(trackingData?.current_status || '')}`}>
-                {trackingData?.current_status}
-              </span>
-            </CardTitle>
+            <CardTitle className="text-2xl">Browse Gifts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Shipment Details</h3>
-                <div className="space-y-2">
-                  <p className="flex items-center text-gray-600">
-                    <Package2 className="w-5 h-5 mr-2" />
-                    AWB: {trackingData?.awb_code}
-                  </p>
-                  <p className="flex items-center text-gray-600">
-                    <Truck className="w-5 h-5 mr-2" />
-                    Courier: {trackingData?.courier_name}
-                  </p>
-                  <p className="flex items-center text-gray-600">
-                    <MapPin className="w-5 h-5 mr-2" />
-                    Destination: {trackingData?.destination}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-2">ETD</h3>
-                <div className="space-y-2">
-                  <p className="text-gray-600">
-                    Pickup Date: {trackingData?.pickup_date ? new Date(trackingData.pickup_date).toLocaleDateString() : 'N/A'}
-                  </p>
-                  <p className="text-gray-600">
-                    Expected Delivery: {trackingData?.etd ? new Date(trackingData.etd).toLocaleDateString() : 'N/A'}
-                  </p>
-                </div>
-              </div>
+            <div className="flex gap-4 mb-8">
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+              />
+              <SortGifts onSortChange={setSortOrder} />
             </div>
 
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4">Tracking History</h3>
-              <div className="space-y-4">
-                {trackingData?.tracking_data?.map((event, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <CheckCircle2 className={`w-6 h-6 ${getStatusColor(event.status)}`} />
-                    </div>
-                    <div className="flex-grow">
-                      <p className="font-medium">{event.status}</p>
-                      <p className="text-sm text-gray-500">{event.location}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(event.date).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredGifts.map(gift => (
+                <div key={gift.id} className="flex flex-col items-center bg-white p-4 rounded-lg shadow-md">
+                  <img src={gift.image} alt={gift.name} className="w-full h-48 object-cover rounded-lg mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">{gift.name}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{gift.description}</p>
+                  <p className="text-lg font-bold text-gray-900 mb-4">${gift.price}</p>
+                  <Button onClick={() => router.push(`/gift/${gift.id}`)} className="w-full bg-blue-600 text-white">
+                    View Details
+                  </Button>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
         <div className="text-center">
-          <Button onClick={() => router.push('/orders')}>
-            Back to Orders
+          <Button onClick={() => router.push('/home')} className="bg-gray-800 text-white">
+            Back to Home
           </Button>
         </div>
       </div>
@@ -171,4 +133,4 @@ const TrackOrder = () => {
   );
 };
 
-export default TrackOrder;
+export default GiftPage;

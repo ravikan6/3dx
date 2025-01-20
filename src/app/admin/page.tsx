@@ -1,49 +1,47 @@
 "use client";
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/component/admin/header/header"
-import { OverviewCards } from "@/component/admin/dashboard/overview-cards"
-import { AnalyticsChart } from "@/component/admin/dashboard/analytics-chart.tsx"
-import { TopProducts } from "@/component/admin/dashboard/top-products"
-import { Button } from "@/components/ui/button"
-import { Plus } from 'lucide-react'
-import Link from "next/link"
 
-export default function Dashboard() {
-  const router = useRouter()
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Sidebar } from "@/components/sidebar";
+import { Header } from "@/component/admin/header/header";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+
+export default function GiftPage() {
+  const router = useRouter();
 
   useEffect(() => {
     const verifySeller = async () => {
       try {
-        const sellerId = localStorage.getItem('sellerId') 
-        
+        const sellerId = localStorage.getItem("sellerId");
+
         if (!sellerId) {
-          router.push('/seller')
-          return
+          router.push("/seller");
+          return;
         }
 
-        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
-          method: 'POST',
+        const response = await fetch("https://backend3dx.onrender.com/admin/verify-seller", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ sellerId })
-        })
+          body: JSON.stringify({ sellerId }),
+        });
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!response.ok || data.loggedIn !== 'loggedin') {
-          router.push('/seller')
+        if (!response.ok || data.loggedIn !== "loggedin") {
+          router.push("/seller");
         }
       } catch (error) {
-        console.error('Error verifying seller:', error)
-        router.push('/seller')
+        console.error("Error verifying seller:", error);
+        router.push("/seller");
       }
-    }
+    };
 
-    verifySeller()
-  }, [router])
+    verifySeller();
+  }, [router]);
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
@@ -55,27 +53,27 @@ export default function Dashboard() {
         <main className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">Dashboard</h1>
+              <h1 className="text-xl font-semibold mb-1">Gift Page</h1>
               <p className="text-sm text-muted-foreground">
-                Track your sales and performance of your strategy
+                Explore and manage your exclusive gift items.
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Link href={`/admin/add-product`}>
+              <Link href={`/admin/add-gift`}>
                 <Button size="sm" className="bg-[#111827] text-white hover:bg-[#111827]/90">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Product
+                  Add Gift
                 </Button>
               </Link>
             </div>
           </div>
-          <OverviewCards />
           <div className="grid gap-6 md:grid-cols-2">
-            <AnalyticsChart />
-            <TopProducts />
+            {/* Add gift-related components or placeholders here */}
+            <div className="bg-white p-4 rounded shadow">Gift Analytics Placeholder</div>
+            <div className="bg-white p-4 rounded shadow">Top Gifts Placeholder</div>
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -30,25 +30,30 @@ export default function CouponPage() {
         expiryDate,
       };
       setCoupons([...coupons, newCoupon]);
-      setName("");
-      setDiscount(0);
-      setExpiryDate("");
-      setIsFormVisible(false);
+      resetForm();
     } else {
       alert("Please fill in all fields.");
     }
   };
 
   const editCoupon = (coupon: Coupon) => {
-    setEditingCoupon(coupon);
-    setName(coupon.name);
-    setDiscount(coupon.discount);
-    setExpiryDate(coupon.expiryDate);
-    setIsFormVisible(true);
+    const updatedCoupons = coupons.map((c) =>
+      c.id === coupon.id ? { ...c, name, discount, expiryDate } : c
+    );
+    setCoupons(updatedCoupons);
+    resetForm();
   };
 
   const deleteCoupon = (couponId: string) => {
     setCoupons(coupons.filter((coupon) => coupon.id !== couponId));
+  };
+
+  const resetForm = () => {
+    setName("");
+    setDiscount(0);
+    setExpiryDate("");
+    setEditingCoupon(null);
+    setIsFormVisible(false);
   };
 
   const filteredCoupons = coupons.filter((coupon) => {
@@ -155,15 +160,13 @@ export default function CouponPage() {
               </div>
             </div>
             <Button
-              onClick={
-                editingCoupon ? () => editCoupon(editingCoupon) : addCoupon
-              }
+              onClick={editingCoupon ? () => editCoupon(editingCoupon) : addCoupon}
               className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700"
             >
               {editingCoupon ? "Update Coupon" : "Save Coupon"}
             </Button>
             <Button
-              onClick={() => setIsFormVisible(false)} // Hide the form when canceled
+              onClick={resetForm}
               className="w-full mt-2 bg-gray-500 text-white hover:bg-gray-600"
             >
               Cancel
@@ -201,7 +204,13 @@ export default function CouponPage() {
                         variant="outline"
                         size="sm"
                         color="blue"
-                        onClick={() => editCoupon(coupon)}
+                        onClick={() => {
+                          setEditingCoupon(coupon);
+                          setName(coupon.name);
+                          setDiscount(coupon.discount);
+                          setExpiryDate(coupon.expiryDate);
+                          setIsFormVisible(true);
+                        }}
                       >
                         Edit
                       </Button>

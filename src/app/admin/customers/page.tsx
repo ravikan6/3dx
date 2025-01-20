@@ -19,12 +19,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
 import { Sidebar } from '@/components/sidebar'
-import { User, UsersResponse } from '@/types/customer'
+import { Gift, GiftsResponse } from '@/types/gift'
 import { useRouter } from 'next/navigation'
 
-export default function CustomersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [sortField, setSortField] = useState<keyof User>('name')
+export default function GiftManagementPage() {
+  const [gifts, setGifts] = useState<Gift[]>([])
+  const [sortField, setSortField] = useState<keyof Gift>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   const router = useRouter()
@@ -62,48 +62,48 @@ export default function CustomersPage() {
   }, [router])
 
   useEffect(() => {
-    fetchUsers()
+    fetchGifts()
   }, [])
 
-  const fetchUsers = async () => {
+  const fetchGifts = async () => {
     try {
-      const response = await fetch('https://backend3dx.onrender.com/get-user')
-      const data: UsersResponse = await response.json()
+      const response = await fetch('https://backend3dx.onrender.com/get-gifts')
+      const data: GiftsResponse = await response.json()
       if (data.success) {
-        setUsers(data.users)
+        setGifts(data.gifts)
       }
     } catch (error) {
-      console.error('Error fetching users:', error)
+      console.error('Error fetching gifts:', error)
     }
   }
 
-  const updateAccountStatus = async (userId: string, newStatus: string) => {
+  const updateGiftStatus = async (giftId: string, newStatus: string) => {
     try {
-      const response = await fetch('https://backend3dx.onrender.com/update-account-status', {
+      const response = await fetch('https://backend3dx.onrender.com/update-gift-status', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId,
-          accountStatus: newStatus,
+          giftId,
+          status: newStatus,
         }),
       })
       
       if (response.ok) {
         // Update local state
-        setUsers(users.map(user => 
-          user.userId === userId 
-            ? { ...user, accountStatus: newStatus as 'open' | 'suspended' | 'blocked' }
-            : user
+        setGifts(gifts.map(gift => 
+          gift.giftId === giftId 
+            ? { ...gift, status: newStatus as 'available' | 'redeemed' | 'expired' }
+            : gift
         ))
       }
     } catch (error) {
-      console.error('Error updating account status:', error)
+      console.error('Error updating gift status:', error)
     }
   }
 
-  const sortUsers = (field: keyof User) => {
+  const sortGifts = (field: keyof Gift) => {
     if (field === sortField) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
@@ -112,7 +112,7 @@ export default function CustomersPage() {
     }
   }
 
-  const sortedUsers = [...users].sort((a, b) => {
+  const sortedGifts = [...gifts].sort((a, b) => {
     const aValue = a[sortField]
     const bValue = b[sortField]
     
@@ -124,10 +124,10 @@ export default function CustomersPage() {
     return 0
   })
 
-  const SortButton = ({ field }: { field: keyof User }) => (
+  const SortButton = ({ field }: { field: keyof Gift }) => (
     <Button
       variant="ghost"
-      onClick={() => sortUsers(field)}
+      onClick={() => sortGifts(field)}
       className="h-8 px-2"
     >
       {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -138,46 +138,46 @@ export default function CustomersPage() {
   return (
     <div className="flex  h-screen">
       <div className="hidden w-64 border-r bg-white md:block">
-      <Sidebar />
+        <Sidebar />
       </div>
       <div className="flex-1 overflow-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Customer Management</h1>
+        <h1 className="text-2xl font-bold mb-6">Gift Management</h1>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead><SortButton field="name" /></TableHead>
-                <TableHead><SortButton field="email" /></TableHead>
-                <TableHead><SortButton field="userId" /></TableHead>
-                <TableHead><SortButton field="phone" /></TableHead>
-                <TableHead>Account Status</TableHead>
+                <TableHead><SortButton field="description" /></TableHead>
+                <TableHead><SortButton field="giftId" /></TableHead>
+                <TableHead><SortButton field="value" /></TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead><SortButton field="createdAt" /></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedUsers.map((user) => (
-                <TableRow key={user.userId}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell className="font-mono">{user.userId}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
+              {sortedGifts.map((gift) => (
+                <TableRow key={gift.giftId}>
+                  <TableCell>{gift.name}</TableCell>
+                  <TableCell>{gift.description}</TableCell>
+                  <TableCell className="font-mono">{gift.giftId}</TableCell>
+                  <TableCell>{gift.value}</TableCell>
                   <TableCell>
                     <Select
-                      value={user.accountStatus}
-                      onValueChange={(value) => updateAccountStatus(user.userId, value)}
+                      value={gift.status}
+                      onValueChange={(value) => updateGiftStatus(gift.giftId, value)}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="suspended">Suspended</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
+                        <SelectItem value="available">Available</SelectItem>
+                        <SelectItem value="redeemed">Redeemed</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
                   <TableCell>
-                    {new Date(user.createdAt).toLocaleDateString()}
+                    {new Date(gift.createdAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
@@ -188,4 +188,3 @@ export default function CustomersPage() {
     </div>
   )
 }
-

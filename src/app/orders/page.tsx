@@ -1,7 +1,6 @@
-
-// page.tsx
 'use client'
-interface Product {
+
+interface GiftItem {
   id: string;
   name: string;
   price: number;
@@ -15,24 +14,17 @@ interface ShippingAddress {
   zipCode: string;
 }
 
-interface Coupon {
-  code: string;
-  discount?: number;
-}
-
-interface Order {
-  order_id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  orderedProducts: Product[];
+interface Gift {
+  gift_id: string;
+  sender: string;
+  recipient: string;
+  message: string;
   shippingAddress?: ShippingAddress;
-  appliedCoupon?: Coupon;
+  giftItems: GiftItem[];
+  amount: number;
+  status: string;
   createdAt: string;
-  userId: string;
-  payment_id?: string;
 }
-
 
 import { useState, useEffect, JSX } from 'react';
 import { Eye } from 'lucide-react';
@@ -45,7 +37,6 @@ const getStatusColor = (status: string): string => {
     case 'processing':
     case 'created':
       return 'bg-yellow-100 text-yellow-800';
-    case 'paid':
     case 'shipped':
       return 'bg-blue-100 text-blue-800';
     default:
@@ -61,61 +52,61 @@ const formatDate = (dateString: string): string => {
   });
 };
 
-export default function MyOrders(): JSX.Element {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+export default function MyGifts(): JSX.Element {
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchOrders();
+    fetchGifts();
   }, []);
 
-  const fetchOrders = async (): Promise<void> => {
+  const fetchGifts = async (): Promise<void> => {
     try {
-      const userId = sessionStorage.getItem('userId')
-      const response = await fetch(`https://backend3dx.onrender.com/order/user-orders/${userId}`);
+      const userId = sessionStorage.getItem('userId');
+      const response = await fetch(`https://backend3dx.onrender.com/gift/user-gifts/${userId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch orders');
+        throw new Error('Failed to fetch gifts');
       }
-      const data: { success: boolean; orders: Order[]; message?: string } = await response.json();
+      const data: { success: boolean; gifts: Gift[]; message?: string } = await response.json();
       if (data.success) {
-        setOrders(data.orders);
+        setGifts(data.gifts);
       } else {
-        setError(data.message || 'Failed to fetch orders');
+        setError(data.message || 'Failed to fetch gifts');
       }
     } catch (err) {
-      setError('Failed to load orders. Please try again later.');
-      console.error('Error fetching orders:', err);
+      setError('Failed to load gifts. Please try again later.');
+      console.error('Error fetching gifts:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleViewDetails = async (orderId: string): Promise<void> => {
+  const handleViewDetails = async (giftId: string): Promise<void> => {
     setLoading(true);
-    setSelectedOrder(null);
+    setSelectedGift(null);
 
     try {
-      const response = await fetch(`https://backend3dx.onrender.com/order/orders/${orderId}`);
+      const response = await fetch(`https://backend3dx.onrender.com/gift/gifts/${giftId}`);
       if (!response.ok) {
-        throw new Error(`Error fetching order details: ${response.statusText}`);
+        throw new Error(`Error fetching gift details: ${response.statusText}`);
       }
-      const data: Order = await response.json();
-      setSelectedOrder(data);
+      const data: Gift = await response.json();
+      setSelectedGift(data);
     } catch (error) {
       console.error(error);
-      setError('Failed to load order details.');
+      setError('Failed to load gift details.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && orders.length === 0) {
+  if (loading && gifts.length === 0) {
     return (
       <main className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">Loading orders...</div>
+          <div className="text-center">Loading gifts...</div>
         </div>
       </main>
     );
@@ -135,32 +126,32 @@ export default function MyOrders(): JSX.Element {
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
-          <p className="mt-2 text-gray-600">View and track your orders</p>
+          <h1 className="text-2xl font-bold text-gray-900">My Gifts</h1>
+          <p className="mt-2 text-gray-600">View and track your sent gifts</p>
         </div>
 
-        {orders.length === 0 ? (
+        {gifts.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600">You haven't placed any orders yet.</p>
+            <p className="text-gray-600">You haven't sent any gifts yet.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {orders.map((order) => (
-              <div key={order.order_id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            {gifts.map((gift) => (
+              <div key={gift.gift_id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Order #{order.order_id}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">Gift to {gift.recipient}</h3>
                       <p className="text-sm text-gray-500">
-                        Placed on {formatDate(order.createdAt)}
+                        Sent on {formatDate(gift.createdAt)}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                      {order.status}
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(gift.status)}`}>
+                      {gift.status}
                     </span>
                   </div>
 
-                  {order.orderedProducts.map((item) => (
+                  {gift.giftItems.map((item) => (
                     <div key={item.id} className="flex items-center py-4 border-t border-gray-200">
                       <div className="h-20 w-20 flex-shrink-0">
                         <Image
@@ -180,10 +171,10 @@ export default function MyOrders(): JSX.Element {
 
                   <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
                     <div className="text-sm font-medium text-gray-900">
-                      Total: ₹{order.amount.toFixed(2)}
+                      Total: ₹{gift.amount.toFixed(2)}
                     </div>
                     <button
-                      onClick={() => handleViewDetails(order.order_id)}
+                      onClick={() => handleViewDetails(gift.gift_id)}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
                     >
                       <Eye className="h-4 w-4 mr-2" />
@@ -196,27 +187,27 @@ export default function MyOrders(): JSX.Element {
           </div>
         )}
 
-        {loading && <div className="mt-8 text-center">Loading order details...</div>}
+        {loading && <div className="mt-8 text-center">Loading gift details...</div>}
 
-        {selectedOrder && (
+        {selectedGift && (
           <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900">Order Details: #{selectedOrder.order_id}</h2>
-            <p className="text-sm text-gray-500">Date: {formatDate(selectedOrder.createdAt)}</p>
-            <p className="text-sm text-gray-500">Status: {selectedOrder.status}</p>
-            
-            {selectedOrder.shippingAddress && (
+            <h2 className="text-lg font-bold text-gray-900">Gift Details: {selectedGift.gift_id}</h2>
+            <p className="text-sm text-gray-500">Sent by: {selectedGift.sender}</p>
+            <p className="text-sm text-gray-500">Message: {selectedGift.message}</p>
+
+            {selectedGift.shippingAddress && (
               <div className="mt-4">
                 <h3 className="text-md font-semibold text-gray-900">Shipping Address:</h3>
                 <p className="text-sm text-gray-600">
-                  {selectedOrder.shippingAddress.street}<br />
-                  {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zipCode}
+                  {selectedGift.shippingAddress.street}<br />
+                  {selectedGift.shippingAddress.city}, {selectedGift.shippingAddress.state} {selectedGift.shippingAddress.zipCode}
                 </p>
               </div>
             )}
             
             <h3 className="mt-4 text-md font-semibold text-gray-900">Items:</h3>
             <ul className="mt-2 space-y-2">
-              {selectedOrder.orderedProducts.map((item) => (
+              {selectedGift.giftItems.map((item) => (
                 <li key={item.id} className="flex items-center">
                   <Image
                     src={item.image || "/placeholder.svg"}
@@ -232,20 +223,9 @@ export default function MyOrders(): JSX.Element {
                 </li>
               ))}
             </ul>
-            
-            {selectedOrder.appliedCoupon && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-600">
-                  Coupon Applied: {selectedOrder.appliedCoupon.code}
-                  {selectedOrder.appliedCoupon.discount && 
-                    ` (-$${selectedOrder.appliedCoupon.discount.toFixed(2)})`
-                  }
-                </p>
-              </div>
-            )}
-            
+
             <p className="mt-4 text-lg font-bold text-gray-900">
-              Total: ₹{selectedOrder.amount.toFixed(2)}
+              Total: ₹{selectedGift.amount.toFixed(2)}
             </p>
           </div>
         )}
