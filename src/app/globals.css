@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background-start-rgb: 255, 255, 255; /* White background */
+    --background-end-rgb: 245, 245, 245; /* Light gray */
+    --foreground-rgb: 3, 3, 3; /* Dark text color */
+    --card-rgb: 255, 255, 255; /* White card background */
+    --card-foreground-rgb: 3, 3, 3; /* Dark card text */
+    --primary-rgb: 9, 9, 9;
+    --primary-foreground-rgb: 245, 245, 245;
+    --secondary-rgb: 245, 245, 245;
+    --secondary-foreground-rgb: 9, 9, 9;
+    --muted-rgb: 245, 245, 245;
+    --muted-foreground-rgb: 115, 115, 115;
+    --accent-rgb: 245, 245, 245;
+    --accent-foreground-rgb: 9, 9, 9;
+    --destructive-rgb: 180, 50, 50; /* Red for destructive */
+    --destructive-foreground-rgb: 245, 245, 245; /* White text */
+    --border-rgb: 225, 225, 225; /* Light gray borders */
+    --input-rgb: 225, 225, 225; /* Input background */
+    --ring-rgb: 15, 15, 15; /* Ring color */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background-start-rgb: 60, 60, 60; /* Dark background */
+    --background-end-rgb: 30, 30, 30; /* Darker background */
+    --foreground-rgb: 245, 245, 245; /* Light text color */
+    --card-rgb: 60, 60, 60; /* Dark card background */
+    --card-foreground-rgb: 245, 245, 245; /* Light card text */
+    --primary-rgb: 245, 245, 245;
+    --primary-foreground-rgb: 9, 9, 9;
+    --secondary-rgb: 30, 30, 30;
+    --secondary-foreground-rgb: 245, 245, 245;
+    --muted-rgb: 30, 30, 30;
+    --muted-foreground-rgb: 150, 150, 150;
+    --accent-rgb: 30, 30, 30;
+    --accent-foreground-rgb: 245, 245, 245;
+    --destructive-rgb: 180, 50, 50;
+    --destructive-foreground-rgb: 245, 245, 245;
+    --border-rgb: 60, 60, 60;
+    --input-rgb: 30, 30, 30;
+    --ring-rgb: 250, 250, 250;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    );
+  }
+}
+
+/* Shadow effect for 3D look */
+.shadow-3d {
+  box-shadow: 
+    0 1px 1px rgba(0,0,0,0.15), 
+    0 2px 2px rgba(0,0,0,0.15), 
+    0 4px 4px rgba(0,0,0,0.15), 
+    0 8px 8px rgba(0,0,0,0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+.shadow-3d:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 1px 1px rgba(0,0,0,0.18), 
+    0 2px 2px rgba(0,0,0,0.18), 
+    0 4px 4px rgba(0,0,0,0.18), 
+    0 8px 8px rgba(0,0,0,0.18),
+    0 16px 16px rgba(0,0,0,0.18);
+}
