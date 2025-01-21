@@ -73,18 +73,7 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
                 >
                   <div className="flex items-center">
                     {label}
-                    {key && (
-                      <ArrowUpDown
-                        size={14}
-                        className={`ml-2 text-black-400 ${
-                          sortConfig.key === key
-                            ? sortConfig.direction === "ascending"
-                              ? "rotate-180"
-                              : "rotate-0"
-                            : ""
-                        }`}
-                      />
-                    )}
+                    {key && <ArrowUpDown size={14} className="ml-2 text-black-400" />}
                   </div>
                 </th>
               ))}
@@ -157,3 +146,5 @@ export function ComplaintsTable({ complaints, onStatusChange }: ComplaintsTableP
     </div>
   );
 }
+
+export default ComplaintsTable;

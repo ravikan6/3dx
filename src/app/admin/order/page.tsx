@@ -20,55 +20,52 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Sidebar } from "@/components/sidebar"; // Import Sidebar component
+import { Sidebar } from "@/components/sidebar";
 import { useRouter } from "next/navigation";
 
-interface Gift {
+interface Order {
   id: string;
-  recipient: string;
-  giftItem: string;
+  customer: string;
+  product: string;
   date: string;
-  value: number;
-  status: "pending" | "dispatched" | "delivered" | "cancelled";
+  total: number;
+  status: "pending" | "processing" | "completed" | "cancelled";
 }
 
-const gifts: Gift[] = [
+const orders: Order[] = [
   {
-    id: "GFT001",
-    recipient: "Alice Johnson",
-    giftItem: "Gift Hamper",
+    id: "ORD001",
+    customer: "John Doe",
+    product: "T-Shirt, Max",
     date: "2024-01-02",
-    value: 1500,
-    status: "delivered",
+    total: 2889,
+    status: "completed",
   },
   {
-    id: "GFT002",
-    recipient: "Bob Smith",
-    giftItem: "Flower Bouquet",
-    date: "2024-01-01",
-    value: 500,
+    id: "ORD002",
+    customer: "Jane Smith",
+    product: "Bird Shorts",
+    date: "2024-01-02",
+    total: 1890,
     status: "pending",
   },
   {
-    id: "GFT003",
-    recipient: "Charlie Brown",
-    giftItem: "Personalized Mug",
+    id: "ORD003",
+    customer: "Bob Johnson",
+    product: "T-Shirt, Max",
     date: "2024-01-01",
-    value: 700,
-    status: "dispatched",
+    total: 2889,
+    status: "processing",
   },
 ];
 
-export default function GiftsPage() {
+export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Gift | null;
+    key: keyof Order | null;
     direction: "ascending" | "descending";
-  }>({
-    key: "date",
-    direction: "descending",
-  });
+  }>({ key: "date", direction: "descending" });
 
   const router = useRouter();
 
@@ -76,7 +73,6 @@ export default function GiftsPage() {
     const verifySeller = async () => {
       try {
         const sellerId = localStorage.getItem("sellerId");
-
         if (!sellerId) {
           router.push("/seller");
           return;
@@ -107,7 +103,7 @@ export default function GiftsPage() {
     verifySeller();
   }, [router]);
 
-  const handleSort = (key: keyof Gift) => {
+  const handleSort = (key: keyof Order) => {
     setSortConfig((current) => ({
       key,
       direction:
@@ -117,16 +113,16 @@ export default function GiftsPage() {
     }));
   };
 
-  const filteredGifts = useMemo(() => {
-    return gifts
-      .filter((gift) => {
+  const filteredOrders = useMemo(() => {
+    return orders
+      .filter((order) => {
         const matchesSearch =
-          gift.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          gift.recipient.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          gift.giftItem.toLowerCase().includes(searchQuery.toLowerCase());
+          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order.product.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesStatus =
-          statusFilter === "all" || gift.status === statusFilter;
+          statusFilter === "all" || order.status === statusFilter;
 
         return matchesSearch && matchesStatus;
       })
@@ -136,19 +132,29 @@ export default function GiftsPage() {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
 
-        if (aValue < bValue)
-          return sortConfig.direction === "ascending" ? -1 : 1;
-        if (aValue > bValue)
-          return sortConfig.direction === "ascending" ? 1 : -1;
+        if (sortConfig.key === "date") {
+          return sortConfig.direction === "ascending"
+            ? new Date(aValue).getTime() - new Date(bValue).getTime()
+            : new Date(bValue).getTime() - new Date(aValue).getTime();
+        }
+
+        if (sortConfig.key === "total") {
+          return sortConfig.direction === "ascending"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+
+        if (aValue < bValue) return sortConfig.direction === "ascending" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "ascending" ? 1 : -1;
         return 0;
       });
-  }, [gifts, searchQuery, statusFilter, sortConfig]);
+  }, [orders, searchQuery, statusFilter, sortConfig]);
 
-  const getStatusColor = (status: Gift["status"]) => {
+  const getStatusColor = (status: Order["status"]) => {
     switch (status) {
-      case "delivered":
+      case "completed":
         return "bg-green-500/10 text-green-500";
-      case "dispatched":
+      case "processing":
         return "bg-blue-500/10 text-blue-500";
       case "pending":
         return "bg-yellow-500/10 text-yellow-500";
@@ -165,19 +171,18 @@ export default function GiftsPage() {
       <div className="flex-1 space-y-8 p-8 pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Gifts</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
             <p className="text-muted-foreground">
-              Manage and track the gifts sent to recipients
+              Manage and monitor your orders
             </p>
           </div>
         </div>
-
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search gifts..."
+                placeholder="Search orders..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -191,13 +196,12 @@ export default function GiftsPage() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="dispatched">Dispatched</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -208,25 +212,25 @@ export default function GiftsPage() {
                       onClick={() => handleSort("id")}
                     >
                       <div className="flex items-center gap-1">
-                        Gift ID
+                        Order ID
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
-                      onClick={() => handleSort("recipient")}
+                      onClick={() => handleSort("customer")}
                     >
                       <div className="flex items-center gap-1">
-                        Recipient
+                        Customer
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
-                      onClick={() => handleSort("giftItem")}
+                      onClick={() => handleSort("product")}
                     >
                       <div className="flex items-center gap-1">
-                        Gift Item
+                        Product
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
@@ -241,44 +245,34 @@ export default function GiftsPage() {
                     </TableHead>
                     <TableHead
                       className="cursor-pointer text-right"
-                      onClick={() => handleSort("value")}
+                      onClick={() => handleSort("total")}
                     >
                       <div className="flex items-center justify-end gap-1">
-                        Value
+                        Total
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("status")}
-                    >
-                      <div className="flex items-center gap-1">
-                        Status
-                        <ArrowUpDown className="h-4 w-4" />
-                      </div>
-                    </TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredGifts.length > 0 ? (
-                    filteredGifts.map((gift) => (
-                      <TableRow key={gift.id}>
-                        <TableCell className="font-medium">
-                          {gift.id}
-                        </TableCell>
-                        <TableCell>{gift.recipient}</TableCell>
-                        <TableCell>{gift.giftItem}</TableCell>
-                        <TableCell>{gift.date}</TableCell>
+                  {filteredOrders.length > 0 ? (
+                    filteredOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell>{order.product}</TableCell>
+                        <TableCell>{order.date}</TableCell>
                         <TableCell className="text-right">
-                          ₹{gift.value.toLocaleString()}
+                          ₹{order.total.toLocaleString()}
                         </TableCell>
                         <TableCell>
                           <Badge
                             variant="secondary"
-                            className={getStatusColor(gift.status)}
+                            className={getStatusColor(order.status)}
                           >
-                            {gift.status.charAt(0).toUpperCase() +
-                              gift.status.slice(1)}
+                            {order.status.charAt(0).toUpperCase() +
+                              order.status.slice(1)}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -289,7 +283,7 @@ export default function GiftsPage() {
                         colSpan={6}
                         className="h-24 text-center text-muted-foreground"
                       >
-                        No gifts found.
+                        No orders found.
                       </TableCell>
                     </TableRow>
                   )}

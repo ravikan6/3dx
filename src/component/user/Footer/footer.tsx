@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Box } from 'lucide-react';
-import Link from 'next/link';
-import { NewsletterForm } from './newsletter';
-import { motion } from 'framer-motion';
+import React from "react";
+import { Box } from "lucide-react";
+import Link from "next/link";
+import { NewsletterForm } from "./newsletter"; // Ensure this component exists
+import { motion } from "framer-motion";
 
 export function Footer() {
   return (
@@ -36,13 +36,16 @@ export function Footer() {
           >
             <h3 className="text-lg font-semibold text-white">Quick Links</h3>
             <ul className="mt-4 space-y-3 text-gray-400">
-              {['Products', 'Creators', 'About Us', 'Contact'].map((item) => (
+              {["Products", "Creators", "About Us", "Contact"].map((item) => (
                 <motion.li
                   key={item}
-                  whileHover={{ scale: 1.05, color: '#3b82f6' }}
+                  whileHover={{ scale: 1.05, color: "#3b82f6" }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Link href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-blue-400">
+                  <Link
+                    href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="hover:text-blue-400"
+                  >
                     {item}
                   </Link>
                 </motion.li>
@@ -59,13 +62,16 @@ export function Footer() {
           >
             <h3 className="text-lg font-semibold text-white">Support</h3>
             <ul className="mt-4 space-y-3 text-gray-400">
-              {['FAQ', 'Shipping', 'Returns', 'Track Order'].map((item) => (
+              {["FAQ", "Shipping", "Returns", "Track Order"].map((item) => (
                 <motion.li
                   key={item}
-                  whileHover={{ scale: 1.05, color: '#3b82f6' }}
+                  whileHover={{ scale: 1.05, color: "#3b82f6" }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Link href={`/${item.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-blue-400">
+                  <Link
+                    href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="hover:text-blue-400"
+                  >
                     {item}
                   </Link>
                 </motion.li>
@@ -84,15 +90,13 @@ export function Footer() {
             <p className="mt-4 text-gray-400">
               Subscribe to get updates on new products and special offers.
             </p>
-            <NewsletterForm />
+            <NewsletterForm /> {/* Ensure the NewsletterForm component is correctly implemented */}
           </motion.div>
         </div>
 
         {/* Footer Bottom Section */}
-        <div className="border-t border-gray-700 mt-12 pt-6 text-center">
-          <p className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} 3D.xyz. All rights reserved.
-          </p>
+        <div className="mt-12 text-center text-gray-400">
+          <p>&copy; {new Date().getFullYear()} 3D.xyz. All rights reserved.</p>
         </div>
       </div>
     </footer>

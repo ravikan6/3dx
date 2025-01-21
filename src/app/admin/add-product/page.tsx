@@ -14,7 +14,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -39,40 +38,43 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function AddProductPage() {
   const [images, setImages] = useState<string[]>([]);
-
-  const router = useRouter()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const verifySeller = async () => {
       try {
-        const sellerId = localStorage.getItem('sellerId') 
-        
+        const sellerId = localStorage.getItem("sellerId");
+
         if (!sellerId) {
-          router.push('/seller')
-          return
+          router.push("/seller");
+          return;
         }
 
-        const response = await fetch('https://backend3dx.onrender.com/admin/verify-seller', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ sellerId })
-        })
+        const response = await fetch(
+          "https://backend3dx.onrender.com/admin/verify-seller",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sellerId }),
+          }
+        );
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!response.ok || data.loggedIn !== 'loggedin') {
-          router.push('/seller')
+        if (!response.ok || data.loggedIn !== "loggedin") {
+          router.push("/seller");
         }
       } catch (error) {
-        console.error('Error verifying seller:', error)
-        router.push('/seller')
+        console.error("Error verifying seller:", error);
+        router.push("/seller");
       }
-    }
+    };
 
-    verifySeller()
-  }, [router])
+    verifySeller();
+  }, [router]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -118,6 +120,7 @@ export default function AddProductPage() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   async function onSubmit(values: FormValues) {
+    setLoading(true);
     const payload = {
       ...values,
       img: images,
@@ -152,6 +155,8 @@ export default function AddProductPage() {
       }
     } catch (error) {
       console.error("Error adding product:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -164,6 +169,7 @@ export default function AddProductPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Product ID */}
               <FormField
                 control={form.control}
                 name="productId"
@@ -179,6 +185,8 @@ export default function AddProductPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Product Name */}
               <FormField
                 control={form.control}
                 name="productName"
@@ -191,6 +199,8 @@ export default function AddProductPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Product Price */}
               <FormField
                 control={form.control}
                 name="productPrice"
@@ -209,6 +219,8 @@ export default function AddProductPage() {
                   </FormItem>
                 )}
               />
+
+              {/* In Stock */}
               <FormField
                 control={form.control}
                 name="inStock"
@@ -228,6 +240,8 @@ export default function AddProductPage() {
                 )}
               />
             </div>
+
+            {/* Dropzone */}
             <div>
               <FormLabel>Product Images</FormLabel>
               <div
@@ -258,6 +272,8 @@ export default function AddProductPage() {
                 ))}
               </div>
             </div>
+
+            {/* Categories */}
             <FormField
               control={form.control}
               name="categories"
@@ -300,8 +316,14 @@ export default function AddProductPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
-              Add Product
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 text-white hover:bg-blue-700"
+              disabled={loading}
+            >
+              {loading ? "Adding Product..." : "Add Product"}
             </Button>
           </form>
         </Form>

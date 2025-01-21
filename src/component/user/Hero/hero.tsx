@@ -42,7 +42,7 @@ export default function Hero() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="text-center"
         >
-          <motion.div
+          <motion.div 
             className="w-full max-w-3xl mx-auto mb-6" // Adjusted max width
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,8 +73,11 @@ export default function Hero() {
             />
           </motion.div>
 
-          <Link href="/shop" passHref>
-            <motion.a
+          <Link
+            href="/shop"
+            passHref
+          >
+            <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.9 }}
@@ -83,7 +86,7 @@ export default function Hero() {
               className="px-8 py-3 border border-white/20 rounded-full text-sm uppercase tracking-widest hover:bg-white hover:text-zinc-900 transition-colors duration-300"
             >
               Shop Now
-            </motion.a>
+            </motion.button>
           </Link>
         </motion.div>
       </div>

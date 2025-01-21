@@ -1,9 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { featuredProducts } from '@/data/productdetails';
-import { motion } from 'framer-motion';
+import React from "react";
+import Link from "next/link";
+import { featuredProducts } from "@/data/productdetails"; // Ensure this path is correct
+import { motion } from "framer-motion";
+
+// Type definition for a product (make sure this matches your data structure)
+interface Product {
+  id: string;
+  title: string;
+  image: string;
+  description: string;
+  price: number;
+}
 
 export function FeaturedProducts() {
   const containerVariants = {
@@ -25,7 +34,7 @@ export function FeaturedProducts() {
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 100,
         damping: 12,
       },
@@ -53,7 +62,7 @@ export function FeaturedProducts() {
           initial="hidden"
           animate="visible"
         >
-          {featuredProducts.map((product) => (
+          {featuredProducts.map((product: Product) => (
             <Link href="/shop" key={product.id} passHref>
               <motion.div
                 variants={cardVariants}
@@ -79,7 +88,7 @@ export function FeaturedProducts() {
                     <motion.span
                       className="text-3xl font-bold text-gray-900"
                       whileHover={{ scale: 1.1 }}
-                      transition={{ type: 'spring', stiffness: 200 }}
+                      transition={{ type: "spring", stiffness: 200 }}
                     >
                       ₹{product.price?.toFixed(2)}
                     </motion.span>
@@ -97,6 +106,14 @@ export function FeaturedProducts() {
               </motion.div>
             </Link>
           ))}
+        </motion.div>
+
+        <motion.div
+          className="text-center mt-16"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Placeholder for any additional content */}
         </motion.div>
       </div>
     </section>

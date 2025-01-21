@@ -18,6 +18,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
     0
   );
 
+  const shippingCost = 5.99;
+  const grandTotal = totalAmount + shippingCost;
+
   return (
     <div className="bg-white rounded-3xl p-8 shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Order Summary</h2>
@@ -34,11 +37,10 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
           <span>Subtotal:</span> <span>Rs.{totalAmount.toFixed(2)}</span>
         </p>
         <p className="flex justify-between mb-4">
-          <span>Shipping:</span> <span>Rs.5.99</span>
+          <span>Shipping:</span> <span>Rs.{shippingCost.toFixed(2)}</span>
         </p>
         <p className="flex justify-between font-bold text-lg text-gray-800">
-          <span>Total:</span>{" "}
-          <span>Rs.{(totalAmount + 5.99).toFixed(2)}</span>
+          <span>Total:</span> <span>Rs.{grandTotal.toFixed(2)}</span>
         </p>
       </div>
     </div>
@@ -46,4 +48,3 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
 };
 
 export default OrderSummary;
-

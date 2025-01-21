@@ -7,40 +7,40 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Product } from "@/types/product";
 
-export default function GiftPage() {
+export default function ProductDetail() {
   const { productId } = useParams();
   const router = useRouter();
-  const [gift, setGift] = useState<Product | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
-    const fetchGift = async () => {
+    const fetchProduct = async () => {
       try {
         const response = await fetch(`https://backend3dx.onrender.com/product/product/${productId}`);
         const data = await response.json();
 
         if (data.success) {
-          setGift(data.product);
-          // Update page title to reflect gift item
-          document.title = `Gift: ${data.product.productName}`;
+          setProduct(data.product);
+          // Update page title
+          document.title = data.product.productName;
         } else {
-          setError("Gift item not found");
+          setError("Product not found");
         }
       } catch (err) {
-        setError("Failed to load gift item");
-        console.error("Error fetching gift item:", err);
+        setError("Failed to load product");
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGift();
+    fetchProduct();
   }, [productId]);
 
-  const handleAddToGiftBox = async () => {
+  const handleAddToBasket = async () => {
     const userId = sessionStorage.getItem("userId");
 
     if (!userId) {
@@ -50,7 +50,11 @@ export default function GiftPage() {
     }
 
     try {
-      // Make the API call to add the gift to the user's gift box (or cart)
+      if (!product?.productId) {
+        setError("Product information is missing");
+        return;
+      }
+      // Make the API call to add the product to the cart
       await fetch("https://backend3dx.onrender.com/cart/addtocart", {
         method: "POST",
         headers: {
@@ -58,15 +62,15 @@ export default function GiftPage() {
         },
         body: JSON.stringify({
           userId,
-          productId: gift?.productId,
+          productId: product.productId,
           quantity: 1,
         }),
       });
 
-      alert("Gift added to your gift box!");
+      alert("Product added to basket successfully!");
     } catch (error) {
-      console.error("Error adding gift to box:", error);
-      alert("Failed to add gift to your box. Please try again.");
+      console.error("Error adding product to basket:", error);
+      alert("Failed to add product to basket. Please try again.");
     }
   };
 
@@ -78,10 +82,10 @@ export default function GiftPage() {
     );
   }
 
-  if (error || !gift) {
+  if (error || !product) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">{error || "Gift item not found"}</p>
+        <p className="text-red-500">{error || "Product not found"}</p>
       </div>
     );
   }
@@ -93,14 +97,14 @@ export default function GiftPage() {
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-lg">
             <img
-              src={gift.img[selectedImage]}
-              alt={gift.productName}
+              src={product.img[selectedImage]}
+              alt={product.productName}
               className="object-cover"
               loading="lazy"
             />
           </div>
           <div className="flex space-x-2 overflow-x-auto">
-            {gift.img.map((image, index) => (
+            {product.img.map((image, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
@@ -109,7 +113,7 @@ export default function GiftPage() {
               >
                 <img
                   src={image}
-                  alt={`${gift.productName} view ${index + 1}`}
+                  alt={`${product.productName} view ${index + 1}`}
                   className="object-cover"
                 />
               </button>
@@ -117,11 +121,11 @@ export default function GiftPage() {
           </div>
         </div>
 
-        {/* Right column - Gift details */}
+        {/* Right column - Product details */}
         <div className="space-y-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">{gift.productName}</h1>
-            <p className="text-gray-600">{gift.categories.join(", ")}</p>
+            <h1 className="text-3xl font-bold">{product.productName}</h1>
+            <p className="text-gray-600">{product.categories.join(", ")}</p>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -129,7 +133,9 @@ export default function GiftPage() {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-5 h-5 ${i < 4 ? "fill-primary text-primary" : "fill-muted text-muted-foreground"}`}
+                  className={`w-5 h-5 ${
+                    i < 4 ? "fill-primary text-primary" : "fill-muted text-muted-foreground"
+                  }`}
                 />
               ))}
             </div>
@@ -137,12 +143,12 @@ export default function GiftPage() {
           </div>
 
           <div className="text-3xl font-bold">
-            ₹{gift.productPrice.toFixed(2)}
+            ₹{product.productPrice.toFixed(2)}
           </div>
 
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Stock: {gift.inStock} units available
+              Stock: {product.inStock} units available
             </p>
           </div>
 
@@ -150,14 +156,14 @@ export default function GiftPage() {
             <Button className="flex-1" variant="outline">
               Buy Now
             </Button>
-            <Button className="flex-1" onClick={handleAddToGiftBox}>
-              Add to Gift Box
+            <Button className="flex-1" onClick={handleAddToBasket}>
+              Add to Basket
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Dialog Box for non-logged-in users */}
+      {/* Dialog Box */}
       {showDialog && (
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent>
@@ -165,7 +171,7 @@ export default function GiftPage() {
               <DialogTitle>Oops! You are not logged in</DialogTitle>
             </DialogHeader>
             <p className="text-sm text-muted-foreground">
-              Please log in to add gifts to your gift box.
+              Please log in to add products to your basket.
             </p>
             <DialogFooter>
               <Button

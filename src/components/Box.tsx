@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'; // Ensure cn is defined as per your setup
 
 interface BoxProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -17,4 +17,3 @@ export function Box({ className, ...props }: BoxProps) {
     />
   );
 }
-

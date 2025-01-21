@@ -44,4 +44,3 @@ export function LogoutDialog({ isOpen, onConfirm, onCancel }: LogoutDialogProps)
     </AnimatePresence>
   );
 }
-

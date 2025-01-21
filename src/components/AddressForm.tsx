@@ -82,7 +82,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ address, setAddress, saveAddr
         <Checkbox
           id="saveAddress"
           checked={saveAddress}
-          onCheckedChange={(checked) => setSaveAddress(checked as boolean)}
+          onCheckedChange={(checked: boolean) => setSaveAddress(checked)}
         />
         <label
           htmlFor="saveAddress"
@@ -96,4 +96,3 @@ const AddressForm: React.FC<AddressFormProps> = ({ address, setAddress, saveAddr
 };
 
 export default AddressForm;
-

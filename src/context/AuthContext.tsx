@@ -50,19 +50,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
     if (userId) {
-      const fetchUser = async () => {
-        try {
-          const userData = await fetchUserName(userId);
-          setUser((prevUser) => ({
-            ...prevUser,
-            userId,
-            name: userData,
-          }));
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      };
-      fetchUser();
+      // Fetch user data if userId exists
+      fetchUserName(userId);
+    } else {
+      setUser(null); // Clear user state if session expired
     }
   }, []);
 
@@ -72,24 +63,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     phone: string,
     password: string
   ): Promise<string> => {
-    try {
-      const response = await api.post("/auth/signup", {
-        name,
-        email,
-        phone,
-        password,
-      });
-      const { userId } = response.data;
+    const response = await api.post("/auth/signup", {
+      name,
+      email,
+      phone,
+      password,
+    });
+    const { userId } = response.data;
 
-      // Store userId in sessionStorage
-      sessionStorage.setItem("userId", userId);
+    // Store userId in sessionStorage
+    sessionStorage.setItem("userId", userId);
 
-      setUser({ name, email, phone, userId });
-      return userId;
-    } catch (error: any) {
-      console.error("Signup error:", error);
-      throw new Error("Signup failed. Please try again.");
-    }
+    setUser({ name, email, phone, userId });
+    return userId;
   };
 
   const login = async (email: string, password: string): Promise<string> => {
@@ -97,13 +83,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await api.post("/auth/login", { email, password });
 
       if (response.data.message === "Login successful") {
-        const { userId, name, email } = response.data;
+        const { userId, name, phone } = response.data;
 
         // Save userId in sessionStorage
         sessionStorage.setItem("userId", userId);
 
         // Update the state with the logged-in user
-        setUser({ name, email, userId });
+        setUser({ userId, email, name, phone });
+
         return "Login successful";
       } else {
         throw new Error("Login failed");
@@ -139,13 +126,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const fetchUserName = async (userId: string): Promise<string> => {
-    try {
-      const response = await api.get(`/auth/user/${userId}`);
-      return response.data.name;
-    } catch (error) {
-      console.error("Error fetching user name:", error);
-      throw new Error("Unable to fetch user data.");
-    }
+    const response = await api.get(`/auth/user/${userId}`);
+    const userName = response.data.name;
+    setUser((prevUser) => (prevUser ? { ...prevUser, name: userName } : null));
+    return userName;
   };
 
   return (

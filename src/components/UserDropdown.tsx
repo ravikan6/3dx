@@ -17,7 +17,7 @@ interface UserDropdownProps {
   onLogout: () => void;
 }
 
-export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps) {
+export function UserDropdown({ isOpen, isLoggedIn, onLogout, onClose }: UserDropdownProps) {
   const loggedOutItems: UserDropdownItem[] = [
     { name: 'Login', href: '/login', icon: RiLoginBoxLine },
     { name: 'Sign Up', href: '/signup', icon: RiUserAddLine },
@@ -46,7 +46,10 @@ export function UserDropdown({ isOpen, isLoggedIn, onLogout }: UserDropdownProps
             {items.map((item) => (
               <Link key={item.name} href={item.href} legacyBehavior>
                 <a
-                  onClick={item.onClick} // Will only be invoked if defined
+                  onClick={() => {
+                    if (item.onClick) item.onClick();
+                    onClose(); // Close the dropdown after click
+                  }}
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <item.icon className="mr-3 h-5 w-5" />

@@ -19,53 +19,48 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-// Gift form schema
+// Validation schema using Zod
 const formSchema = z.object({
-  recipientName: z.string().min(2, {
-    message: "Recipient name must be at least 2 characters.",
-  }),
-  giftMessage: z.string().min(10, {
-    message: "Gift message must be at least 10 characters.",
-  }),
-  deliveryAddress: z.string().min(5, {
-    message: "Please enter a valid delivery address.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
+  firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
+  lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
+  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
   privacy: z.boolean().refine((val) => val === true, {
     message: "You must agree to our privacy policy.",
   }),
 });
 
-export default function GiftPage() {
+export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      recipientName: "",
-      giftMessage: "",
-      deliveryAddress: "",
+      firstName: "",
+      lastName: "",
       email: "",
+      message: "",
       privacy: false,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
 
+    const userId = sessionStorage.getItem("userId");
+    const userType = userId ? "registered" : "unregistered";
+
     const payload = {
-      recipientName: values.recipientName,
-      giftMessage: values.giftMessage,
-      deliveryAddress: values.deliveryAddress,
+      name: `${values.firstName} ${values.lastName}`,
       email: values.email,
+      message: values.message,
+      userType,
     };
 
     try {
       const response = await fetch(
-        "https://backend3dx.onrender.com/gift/send-gift", // Update API endpoint for gift submission
+        "https://backend3dx.onrender.com/complaints/post-complaints",
         {
           method: "POST",
           headers: {
@@ -82,49 +77,59 @@ export default function GiftPage() {
         setTimeout(() => {
           window.location.reload();
         }, 5000);
+      } else {
+        throw new Error(data.message || "Failed to submit the form.");
       }
     } catch (error) {
-      console.error("Error submitting gift form:", error);
+      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Left Column - Gift Form */}
           <div className="space-y-8">
-            <div>
-              <h1 className="text-5xl font-extrabold mb-4">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-800">
-                  Send a Thoughtful Gift
-                </span>
-                <span className="text-gray-800 block text-3xl mt-2">
-                  Surprise someone special with a personalized gift!
-                </span>
-              </h1>
-              <p className="text-gray-600">
-                Want to send a thoughtful gift? Fill out the details below, and we'll take care of the rest!
-              </p>
-            </div>
+            <h1 className="text-5xl font-extrabold mb-4">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-800">
+                Let's Chat, Reach Out to Us
+              </span>
+              <span className="text-gray-800 block text-3xl mt-2">
+                We'd love to hear from you
+              </span>
+            </h1>
+            <p className="text-gray-600">
+              Have questions or feedback? We&apos;re here to help. Send us a
+              message, and we&apos;ll respond within 24 hours.
+            </p>
 
             {!isSubmitted ? (
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
                       control={form.control}
-                      name="recipientName"
+                      name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Recipient Name</FormLabel>
+                          <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Recipient name" {...field} />
+                            <Input placeholder="First name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Last name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -134,44 +139,26 @@ export default function GiftPage() {
 
                   <FormField
                     control={form.control}
-                    name="giftMessage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gift Message</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Leave a message for the recipient"
-                            className="min-h-[150px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="deliveryAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Delivery Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Delivery address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email Address</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your email address" {...field} />
+                          <Input placeholder="Email address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Message</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Leave us a message" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -182,20 +169,17 @@ export default function GiftPage() {
                     control={form.control}
                     name="privacy"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormItem className="flex flex-row items-start space-x-3">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked) => field.onChange(!!checked)}
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I agree to our friendly{" "}
-                            <a
-                              href="#"
-                              className="text-blue-600 hover:underline"
-                            >
+                            I agree to the{" "}
+                            <a href="#" className="text-blue-600 hover:underline">
                               privacy policy
                             </a>
                           </FormLabel>
@@ -210,29 +194,25 @@ export default function GiftPage() {
                     className="w-full bg-gray-800 hover:bg-gray-900 text-white"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Sending Gift..." : "Send Gift"}
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </Form>
             ) : (
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-green-600">
-                  Gift Sent Successfully!
+                  Form submitted successfully!
                 </h2>
-                <p className="text-gray-600">
-                  Your thoughtful gift will be delivered shortly.
-                </p>
+                <p className="text-gray-600">You will be contacted shortly.</p>
               </div>
             )}
           </div>
 
-          {/* Right Column - Contact Info and Image */}
           <div className="lg:pl-8">
             <div className="relative h-[400px] mb-8 rounded-2xl overflow-hidden bg-blue-100">
-              <div className="absolute inset-0 " />
               <img
-                src="/gift/illustration.jpg"
-                alt="Gift"
+                src="/contact/illustration.jpg"
+                alt="Contact"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -244,7 +224,7 @@ export default function GiftPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Email</h3>
-                  <p className="text-gray-600">support@yourgiftshop.com</p>
+                  <p className="text-gray-600">techteam@kawruh.com</p>
                 </div>
               </div>
 

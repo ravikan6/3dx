@@ -1,14 +1,16 @@
 "use client";
-
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router"; // Ensure the import is from next/router
 import { Sidebar } from "@/components/sidebar";
-import { Header } from "@/component/admin/header/header";
+import { Header } from "@/components/admin/header/header"; // Fix path for Header
+import { OverviewCards } from "@/components/admin/dashboard/overview-cards"; // Fix path for OverviewCards
+import { AnalyticsChart } from "@/components/admin/dashboard/analytics-chart"; // Fix path for AnalyticsChart
+import { TopProducts } from "@/components/admin/dashboard/top-products"; // Fix path for TopProducts
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
-export default function GiftPage() {
+export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
@@ -21,13 +23,16 @@ export default function GiftPage() {
           return;
         }
 
-        const response = await fetch("https://backend3dx.onrender.com/admin/verify-seller", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ sellerId }),
-        });
+        const response = await fetch(
+          "https://backend3dx.onrender.com/admin/verify-seller",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sellerId }),
+          }
+        );
 
         const data = await response.json();
 
@@ -53,24 +58,24 @@ export default function GiftPage() {
         <main className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">Gift Page</h1>
+              <h1 className="text-xl font-semibold mb-1">Dashboard</h1>
               <p className="text-sm text-muted-foreground">
-                Explore and manage your exclusive gift items.
+                Track your sales and performance of your strategy
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Link href={`/admin/add-gift`}>
+              <Link href="/admin/add-product">
                 <Button size="sm" className="bg-[#111827] text-white hover:bg-[#111827]/90">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Gift
+                  Add Product
                 </Button>
               </Link>
             </div>
           </div>
+          <OverviewCards />
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Add gift-related components or placeholders here */}
-            <div className="bg-white p-4 rounded shadow">Gift Analytics Placeholder</div>
-            <div className="bg-white p-4 rounded shadow">Top Gifts Placeholder</div>
+            <AnalyticsChart />
+            <TopProducts />
           </div>
         </main>
       </div>

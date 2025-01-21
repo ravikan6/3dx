@@ -1,5 +1,5 @@
-import { Card } from "@/components/ui/card"
-import { InfoIcon } from 'lucide-react'
+import { Card } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 const products = [
   {
@@ -16,7 +16,7 @@ const products = [
     stock: "100",
     status: "Out of stock",
   },
-]
+];
 
 export function TopProducts() {
   return (
@@ -24,11 +24,11 @@ export function TopProducts() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium">Top Products</h3>
-          <InfoIcon className="h-4 w-4 text-muted-foreground" />
+          <Info className="h-4 w-4 text-muted-foreground" />
         </div>
       </div>
       <div className="space-y-4">
-        <div className="grid grid-cols-5 text-xs text-muted-foreground">
+        <div className="grid grid-cols-5 text-xs text-muted-foreground font-semibold">
           <div>Product</div>
           <div>Sales</div>
           <div>Revenue</div>
@@ -41,13 +41,18 @@ export function TopProducts() {
             <div>{product.sales}</div>
             <div>{product.revenue}</div>
             <div>{product.stock}</div>
-            <div className={product.status === "Out of stock" ? "text-red-500" : "text-green-500"}>
+            <div
+              className={
+                product.status === "Out of stock"
+                  ? "text-red-500 font-medium"
+                  : "text-green-500 font-medium"
+              }
+            >
               {product.status}
             </div>
           </div>
         ))}
       </div>
     </Card>
-  )
+  );
 }
-

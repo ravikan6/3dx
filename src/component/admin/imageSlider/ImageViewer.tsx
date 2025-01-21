@@ -8,13 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-interface GiftImageViewerProps {
-  images: string[]  // Images representing different gift options
-  onClose: () => void  // Function to close the viewer
-  isOpen: boolean  // State to control if the viewer is open
+interface ImageViewerProps {
+  images: string[]
+  onClose: () => void
+  isOpen: boolean
 }
 
-const GiftImageViewer: React.FC<GiftImageViewerProps> = ({ images, onClose, isOpen }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({ images, onClose, isOpen }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handlePrevious = () => {
@@ -26,10 +26,10 @@ const GiftImageViewer: React.FC<GiftImageViewerProps> = ({ images, onClose, isOp
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[75%] sm:h-[75vh]">
         <DialogHeader>
-          <DialogTitle>Gift Images</DialogTitle> {/* Changed from Product to Gift */}
+          <DialogTitle>Product Images</DialogTitle>
         </DialogHeader>
         <div className="relative w-full h-full">
           <Button
@@ -42,7 +42,7 @@ const GiftImageViewer: React.FC<GiftImageViewerProps> = ({ images, onClose, isOp
           </Button>
           <img
             src={images[currentIndex]}
-            alt={`Gift image ${currentIndex + 1}`}  {/* Updated to reflect Gift */}
+            alt={`Product image ${currentIndex + 1}`}
             className="w-full h-full object-contain"
           />
           <Button
@@ -67,4 +67,4 @@ const GiftImageViewer: React.FC<GiftImageViewerProps> = ({ images, onClose, isOp
   )
 }
 
-export default GiftImageViewer
+export default ImageViewer

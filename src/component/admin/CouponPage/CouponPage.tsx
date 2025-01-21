@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { Sidebar } from "@/component/admin/sidebar/sidebar";
@@ -37,11 +37,23 @@ export default function CouponPage() {
   };
 
   const editCoupon = (coupon: Coupon) => {
-    const updatedCoupons = coupons.map((c) =>
-      c.id === coupon.id ? { ...c, name, discount, expiryDate } : c
-    );
-    setCoupons(updatedCoupons);
-    resetForm();
+    setEditingCoupon(coupon);
+    setName(coupon.name);
+    setDiscount(coupon.discount);
+    setExpiryDate(coupon.expiryDate);
+    setIsFormVisible(true);
+  };
+
+  const updateCoupon = () => {
+    if (editingCoupon) {
+      const updatedCoupons = coupons.map((coupon) =>
+        coupon.id === editingCoupon.id
+          ? { ...coupon, name, discount, expiryDate }
+          : coupon
+      );
+      setCoupons(updatedCoupons);
+      resetForm();
+    }
   };
 
   const deleteCoupon = (couponId: string) => {
@@ -52,8 +64,8 @@ export default function CouponPage() {
     setName("");
     setDiscount(0);
     setExpiryDate("");
-    setEditingCoupon(null);
     setIsFormVisible(false);
+    setEditingCoupon(null);
   };
 
   const filteredCoupons = coupons.filter((coupon) => {
@@ -160,7 +172,7 @@ export default function CouponPage() {
               </div>
             </div>
             <Button
-              onClick={editingCoupon ? () => editCoupon(editingCoupon) : addCoupon}
+              onClick={editingCoupon ? updateCoupon : addCoupon}
               className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700"
             >
               {editingCoupon ? "Update Coupon" : "Save Coupon"}
@@ -204,13 +216,7 @@ export default function CouponPage() {
                         variant="outline"
                         size="sm"
                         color="blue"
-                        onClick={() => {
-                          setEditingCoupon(coupon);
-                          setName(coupon.name);
-                          setDiscount(coupon.discount);
-                          setExpiryDate(coupon.expiryDate);
-                          setIsFormVisible(true);
-                        }}
+                        onClick={() => editCoupon(coupon)}
                       >
                         Edit
                       </Button>

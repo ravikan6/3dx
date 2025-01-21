@@ -1,55 +1,84 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from "next";
+
+interface OrderItem {
+  id: number;
+  name: string;
+  image: string;
+  price: string;
+  status: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  items: OrderItem[];
+  total: string;
+  status: string;
+}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { giftId } = req.query;
+  const { orderId } = req.query;
 
-  const mockGifts = [
+  // Validate query parameter
+  if (!orderId || typeof orderId !== "string") {
+    return res.status(400).json({ message: "Invalid or missing orderId" });
+  }
+
+  // Mock orders data
+  const mockOrders: Order[] = [
     {
-      id: "GIFT001",
-      sender: "John Doe",
-      recipient: "Jane Smith",
-      message: "Happy Birthday, enjoy your special day!",
-      deliveryAddress: "123 Main St, Cityville, 12345",
-      status: "Shipped",
-      estimatedDelivery: "2024-02-05",
+      id: "ORD001",
+      date: "2024-01-31",
       items: [
-        { id: 1, name: "3D Custom Portrait", price: "$99.99" },
+        {
+          id: 1,
+          name: "Custom 3D Portrait",
+          image: "/placeholder.svg",
+          price: "$99.99",
+          status: "Delivered",
+        },
       ],
-      total: "$99.99"
-    },
-    {
-      id: "GIFT002",
-      sender: "Alice Cooper",
-      recipient: "Bob Marley",
-      message: "Wishing you all the best for the new year!",
-      deliveryAddress: "456 Elm St, Townsville, 67890",
-      status: "Processing",
-      estimatedDelivery: "2024-02-10",
-      items: [
-        { id: 2, name: "3D Printed Vase Set", price: "$45.99" },
-      ],
-      total: "$45.99"
-    },
-    {
-      id: "GIFT003",
-      sender: "Eve Adams",
-      recipient: "Charles Dickens",
-      message: "Hope this brings a smile to your face!",
-      deliveryAddress: "789 Oak St, Villageville, 11223",
+      total: "$99.99",
       status: "Delivered",
-      estimatedDelivery: "2024-01-30",
+    },
+    {
+      id: "ORD002",
+      date: "2024-01-28",
       items: [
-        { id: 3, name: "Personalized Keychain", price: "$19.99" },
+        {
+          id: 2,
+          name: "3D Printed Vase Set",
+          image: "/placeholder.svg",
+          price: "$45.99",
+          status: "Processing",
+        },
       ],
-      total: "$19.99"
-    }
+      total: "$45.99",
+      status: "Processing",
+    },
+    {
+      id: "ORD003",
+      date: "2024-01-25",
+      items: [
+        {
+          id: 3,
+          name: "Architectural Model Kit",
+          image: "/placeholder.svg",
+          price: "$149.99",
+          status: "Shipped",
+        },
+      ],
+      total: "$149.99",
+      status: "Shipped",
+    },
   ];
 
-  const gift = mockGifts.find((gift) => gift.id === giftId);
+  // Find order by ID
+  const order = mockOrders.find((order) => order.id === orderId);
 
-  if (gift) {
-    res.status(200).json(gift);
+  if (order) {
+    return res.status(200).json(order); // Return order details
   } else {
-    res.status(404).json({ message: "Gift not found" });
+    return res.status(404).json({ message: "Order not found" }); // Handle not found
   }
 }

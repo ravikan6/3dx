@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ export function ProductCard({ product, view }: ProductCardProps) {
       });
 
       alert("Product added to cart successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding product to cart:", error);
       alert("Failed to add product to cart. Please try again.");
     }
@@ -48,13 +48,13 @@ export function ProductCard({ product, view }: ProductCardProps) {
 
   const cardClassName =
     view === "grid"
-      ? "w-full h-[420px] flex flex-col"
-      : "w-full min-h-[200px] flex flex-row";
+      ? "w-full h-[420px] flex flex-col" // Fixed height and flexible width in grid view
+      : "w-full min-h-[200px] flex flex-row"; // Flexible for list view
 
   const imageContainerClassName =
     view === "grid"
-      ? "h-[280px] w-full flex-shrink-0"
-      : "w-[200px] h-[200px] flex-shrink-0";
+      ? "h-[280px] w-full flex-shrink-0" // Fixed image size for grid view
+      : "w-[200px] h-[200px] flex-shrink-0"; // Square image in list view
 
   return (
     <>
@@ -95,9 +95,7 @@ export function ProductCard({ product, view }: ProductCardProps) {
             </div>
           </div>
           <div className="space-y-2 mt-auto">
-            <p className="text-sm text-muted-foreground">
-              {product.inStock} in stock
-            </p>
+            <p className="text-sm text-muted-foreground">{product.inStock} in stock</p>
             <Button
               className="w-full"
               onClick={handleAddToCart}
@@ -137,7 +135,7 @@ const ProductList = ({
   products: Product[];
   view: "grid" | "list";
 }) => {
-  console.log("Rendering product list", products); // Log the products instead of the ProductList component
+  console.log("Product List:", products); // Log the actual products
   return (
     <div
       className={`grid gap-4 ${

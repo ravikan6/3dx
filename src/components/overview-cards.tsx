@@ -1,10 +1,11 @@
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { InfoIcon } from 'lucide-react'
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { InfoIcon } from 'lucide-react';
 
 export function OverviewCards() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
+      {/* Product Overview Card */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -29,6 +30,7 @@ export function OverviewCards() {
         </div>
       </Card>
 
+      {/* Active Sales Card */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -45,6 +47,7 @@ export function OverviewCards() {
         </div>
       </Card>
 
+      {/* Product Revenue Card */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -61,6 +64,7 @@ export function OverviewCards() {
         </div>
       </Card>
     </div>
-  )
+  );
 }
 
+export default OverviewCards;

@@ -12,7 +12,7 @@ interface Customer {
   userId: string;
   name: string;
   email: string;
-  accountStatus: string;
+  accountStatus: 'open' | 'suspended' | 'blocked';
 }
 
 const CustomersPage = () => {
@@ -78,11 +78,6 @@ const CustomersPage = () => {
   };
 
   const handleAddCustomer = async () => {
-    if (!newCustomer.userId || !newCustomer.name || !newCustomer.email) {
-      alert('Please fill all the fields.');
-      return;
-    }
-
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/add-customer`, {
         method: 'POST',
@@ -136,7 +131,7 @@ const CustomersPage = () => {
             />
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border mb-6 p-4">
+            <div className="rounded-md border mb-6">
               <Input
                 placeholder="User ID"
                 value={newCustomer.userId}
@@ -161,13 +156,14 @@ const CustomersPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['User ID', 'Name', 'Email', 'Account Status'].map((header, index) => (
+                    {['userId', 'name', 'email', 'accountStatus'].map((header, index) => (
                       <TableHead
                         key={index}
-                        onClick={() => handleSort(header.toLowerCase() as keyof Customer)}
+                        onClick={() => handleSort(header as keyof Customer)}
+                        className="cursor-pointer"
                       >
-                        <div className="flex items-center cursor-pointer">
-                          {header}
+                        <div className="flex items-center">
+                          {header.charAt(0).toUpperCase() + header.slice(1)}
                           <ArrowUpDown size={14} className="ml-1" />
                         </div>
                       </TableHead>

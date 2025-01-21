@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,40 +28,47 @@ const SavedAddressesDialog: React.FC<SavedAddressesDialogProps> = ({
   savedAddresses,
   setAddress,
 }) => {
+  const handleCloseDialog = () => {
+    setShowAddressDialog(false);
+  };
+
   return (
-    <Dialog open={showAddressDialog} onOpenChange={setShowAddressDialog}>
+    <Dialog open={showAddressDialog} onOpenChange={handleCloseDialog}>
       <DialogContent>
         <DialogTitle>Saved Addresses</DialogTitle>
         <DialogDescription>
           Select an address or enter a new one.
         </DialogDescription>
-        {savedAddresses.map((savedAddress, index) => (
-          <div key={index} className="mb-4 p-4 border rounded">
-            <h3 className="font-bold">Address {index + 1}</h3>
-            <p>
-              {savedAddress.streetAddress}, {savedAddress.city}
-            </p>
-            <p>
-              {savedAddress.state}, {savedAddress.pincode}
-            </p>
-            <p>Phone: {savedAddress.phoneNumber}</p>
-            <Button
-              onClick={() => {
-                setAddress(savedAddress);
-                setShowAddressDialog(false);
-              }}
-            >
-              Use This Address
-            </Button>
-          </div>
-        ))}
-        <Button onClick={() => setShowAddressDialog(false)}>
-          Enter New Address
-        </Button>
+        {savedAddresses && savedAddresses.length > 0 ? (
+          savedAddresses.map((savedAddress, index) => (
+            <div key={index} className="mb-4 p-4 border rounded">
+              <h3 className="font-bold">Address {index + 1}</h3>
+              <p>
+                {savedAddress.streetAddress}, {savedAddress.city}
+              </p>
+              <p>
+                {savedAddress.state}, {savedAddress.pincode}
+              </p>
+              <p>Phone: {savedAddress.phoneNumber}</p>
+              <Button
+                onClick={() => {
+                  setAddress(savedAddress);
+                  handleCloseDialog();
+                }}
+              >
+                Use This Address
+              </Button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No saved addresses available.</p>
+        )}
+        <div className="mt-4">
+          <Button onClick={handleCloseDialog}>Enter New Address</Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
 };
 
 export default SavedAddressesDialog;
-
